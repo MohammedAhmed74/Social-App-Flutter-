@@ -41,7 +41,6 @@ class SocialCubit extends Cubit<SocialStates> {
   UserModel? user;
   Future<void> getUserData() async {
     user = null;
-    print('777777777777777777777777777777777777777');
     // emit(LoadingUserDataState());
     if (CacheHelper.getValue(key: 'uId') != null) {
       FirebaseFirestore.instance
@@ -98,7 +97,6 @@ class SocialCubit extends Cubit<SocialStates> {
   File? messageImage;
   File? commentImage;
   Future<bool> getPhotoFromGallary({required String image}) async {
-    print('gallaryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
     picker
         .pickImage(source: ImageSource.gallery, imageQuality: 70)
         .then((value) {
@@ -136,7 +134,6 @@ class SocialCubit extends Cubit<SocialStates> {
 
   bool errorProfileUpdate = false;
   Future<void> uploadProfileImage() async {
-    print('1111111111111111                1111111111111');
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('Users/${Uri.file(profileImage!.path).pathSegments.last}')
@@ -204,7 +201,6 @@ class SocialCubit extends Cubit<SocialStates> {
 
   late String? messageImg;
   Future<void> uploadMessageImage() async {
-    print('uploadingggggggggggggggggggggggggggggggggggggggggggggggggg');
     emit(LoadingUploadMessageImageState());
     messageImg = '';
     firebase_storage.FirebaseStorage.instance
@@ -279,7 +275,6 @@ class SocialCubit extends Cubit<SocialStates> {
         .then((value) {})
         .catchError((error) {
       print(error);
-      print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     });
   }
 
@@ -294,8 +289,6 @@ class SocialCubit extends Cubit<SocialStates> {
     if (postImage != null) {
       await uploadPostWithImage(text);
     } else {
-      print('postImage == null');
-      print('++++++++++++++++++++++++++++++++++++++++++++');
       post = PostModel(
         uId: user!.uId,
         name: user!.name,
@@ -448,7 +441,6 @@ class SocialCubit extends Cubit<SocialStates> {
           PostModel.fromJson(json: value.data()!, id: value.id);
 
       if (posts[index].userWhoLikeIds!.contains(user!.uId) == false) {
-        print('likeeeeeeeeeeeeeeeeee');
         posts[index].likes_num = posts[index].likes_num + 1;
         posts[index].userWhoLikeIds!.add(user!.uId);
         FirebaseFirestore.instance
@@ -463,7 +455,6 @@ class SocialCubit extends Cubit<SocialStates> {
           emit(SuccessLikePostState());
         });
       } else {
-        print('unLikeeeeeeeeeeeeeeeeeeeeee');
         posts[index].likes_num = posts[index].likes_num - 1;
         posts[index].userWhoLikeIds!.remove(user!.uId);
         FirebaseFirestore.instance
@@ -602,13 +593,10 @@ class SocialCubit extends Cubit<SocialStates> {
 
   List<UserModel> users = [];
   Future getAllUsers() async {
-    print('55555555555555555555555');
-
     emit(LoadingAllUsersDataState());
     FirebaseFirestore.instance.collection('Users').get().then((value) {
       users = [];
       value.docs.forEach((element) {
-        print('a7aaaaaaaaaaaaa');
         if (element.data()['uId'] != user!.uId) {
           users.add(UserModel.fromJson(element.data()));
         }
@@ -659,7 +647,6 @@ class SocialCubit extends Cubit<SocialStates> {
     String? dateTime,
     String? message,
   }) async {
-    print('getting messageessssssssssssssssssssssssssssss');
     emit(LoadingGettingMessagesState());
     FirebaseFirestore.instance
         .collection('Users')
@@ -752,8 +739,6 @@ class SocialCubit extends Cubit<SocialStates> {
     if (commentImage != null) {
       await uploadCommentWithImage(text, postId, postIndex);
     } else {
-      print('commentImage == null');
-      print('++++++++++++++++++++++++++++++++++++++++++++');
       comment0 = CommentModel(
         comment: text,
         userId: user!.uId,
@@ -932,7 +917,6 @@ class SocialCubit extends Cubit<SocialStates> {
       );
 
       if (!comments[index].usersWhoLikeComment!.contains(user!.uId)) {
-        print('likeeeeeeeeeeeeeeeeee');
         comments[index].usersWhoLikeComment!.add(user!.uId);
         comments[index].likes_num = comments[index].likes_num + 1;
         FirebaseFirestore.instance
@@ -954,7 +938,6 @@ class SocialCubit extends Cubit<SocialStates> {
           emit(ErrorLikeCommentState());
         });
       } else {
-        print('unLikeeeeeeeeeeeeeeeeeeeeee');
         comments[index].usersWhoLikeComment!.remove(user!.uId);
         comments[index].likes_num = comments[index].likes_num - 1;
         FirebaseFirestore.instance
@@ -1313,7 +1296,6 @@ class SocialCubit extends Cubit<SocialStates> {
       required String commentId,
       required String replyId,
       required String comment}) async {
-    print('uploadingggggggggggggggggggggggggggggggggggggggggggggggggg');
     emit(LoadingUploadCommentEditedImageState());
     commentEditedImg = '';
 
@@ -1392,7 +1374,6 @@ class SocialCubit extends Cubit<SocialStates> {
       {required String postId,
       required String commentId,
       required String comment}) async {
-    print('uploadingggggggggggggggggggggggggggggggggggggggggggggggggg');
     emit(LoadingUploadCommentEditedImageState());
     commentEditedImg2 = '';
 
@@ -1461,7 +1442,6 @@ class SocialCubit extends Cubit<SocialStates> {
   late String? PostEditedImg2;
   Future<void> editPostWithImage(
       {required String postId, required String text}) async {
-    print('uploadingggggggggggggggggggggggggggggggggggggggggggggggggg');
     emit(LoadingUploadPostEditedImageState());
     PostEditedImg2 = '';
 

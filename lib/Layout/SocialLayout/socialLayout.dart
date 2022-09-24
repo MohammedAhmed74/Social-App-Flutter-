@@ -126,10 +126,10 @@ class NavigationDrawer extends StatelessWidget {
       );
   Widget buildHeader(BuildContext context) => Container(
         color: Colors.amber[100],
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             CircleAvatar(
@@ -137,22 +137,22 @@ class NavigationDrawer extends StatelessWidget {
               backgroundImage:
                   NetworkImage(SocialCubit.get(context).user!.userImage),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Text(
               SocialCubit.get(context).user!.name,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Colors.black),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
               SocialCubit.get(context).user!.email,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87),
@@ -165,14 +165,14 @@ class NavigationDrawer extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text(
+              title: const Text(
                 'Dark Mode',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
-              leading: Icon(
+              leading: const Icon(
                 Icons.dark_mode_outlined,
                 size: 26,
               ),
@@ -182,14 +182,14 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Profile',
                 style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
-              leading: Icon(
+              leading: const Icon(
                 Icons.person_outline,
                 size: 26,
               ),
@@ -199,14 +199,14 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Search',
                 style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
-              leading: Icon(
+              leading: const Icon(
                 Icons.search,
                 size: 26,
               ),
@@ -220,14 +220,14 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text(
+              title: const Text(
                 'Settings',
                 style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
-              leading: Icon(
+              leading: const Icon(
                 Icons.settings_outlined,
                 size: 26,
               ),
@@ -236,7 +236,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditProfileScreen(),
+                      builder: (context) => const EditProfileScreen(),
                     ));
               },
             ),
