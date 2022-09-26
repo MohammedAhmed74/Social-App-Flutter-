@@ -13,12 +13,17 @@ import 'package:social_app/modules/Chats/openImageScreen.dart';
 import 'package:social_app/modules/Comments/commentsScreen.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
+import 'package:social_app/shared/styles/colors.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 class UsersProfile extends StatelessWidget {
   UsersProfile({Key? key, required this.userUid}) : super(key: key);
   late UserModel user;
   String userUid;
+  String edit = 'Edit';
+  String delete = 'Delete';
+  var postEditingCtrl = TextEditingController();
   Map numberToMonth = {
     1: 'Jan',
     2: 'Feb',
@@ -46,19 +51,30 @@ class UsersProfile extends StatelessWidget {
     }
     var cubit = SocialCubit.get(context);
     return BlocConsumer<SocialCubit, SocialStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is ErrorPickedImageState) {
+          SocialCubit.get(context).pickedImage(false);
+        }
+        if (state is SuccessPickedImageState) {
+          SocialCubit.get(context).pickedImage(true);
+        }
+      },
       builder: (context, state) {
         return SafeArea(
           child: Scaffold(
             appBar: AppBar(
               title: Text(
                 user.name,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
               ),
               leading: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
-                  color: Colors.black,
+                  color: CacheHelper.getValue(key: 'lightMode') == true
+                      ? lightTextColor
+                      : darkTextcolor,
                 ),
                 onPressed: () {
                   SocialCubit.get(context).myPosts = null;
@@ -147,10 +163,13 @@ class UsersProfile extends StatelessWidget {
                           user.bio,
                           textAlign: TextAlign.center,
                           maxLines: 3,
-                          style: Theme.of(context)
-                              .textTheme
-                              .caption!
-                              .copyWith(fontSize: 14),
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                fontSize: 14,
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                       ),
                     ),
@@ -167,12 +186,25 @@ class UsersProfile extends StatelessWidget {
                                       .textTheme
                                       .bodyMedium!
                                       .copyWith(
-                                        color: Colors.black,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
                                       ),
                                 ),
                                 Text(
                                   'Posts',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 )
                               ],
                             ),
@@ -186,12 +218,25 @@ class UsersProfile extends StatelessWidget {
                                       .textTheme
                                       .bodyMedium!
                                       .copyWith(
-                                        color: Colors.black,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
                                       ),
                                 ),
                                 Text(
                                   'Photos',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 )
                               ],
                             ),
@@ -205,12 +250,25 @@ class UsersProfile extends StatelessWidget {
                                       .textTheme
                                       .bodyMedium!
                                       .copyWith(
-                                        color: Colors.black,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
                                       ),
                                 ),
                                 Text(
                                   'Followers',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 )
                               ],
                             ),
@@ -224,12 +282,25 @@ class UsersProfile extends StatelessWidget {
                                       .textTheme
                                       .bodyMedium!
                                       .copyWith(
-                                        color: Colors.black,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
                                       ),
                                 ),
                                 Text(
                                   'Following',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 )
                               ],
                             ),
@@ -247,7 +318,7 @@ class UsersProfile extends StatelessWidget {
                         width: double.maxFinite,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     ConditionalBuilder(
@@ -321,7 +392,7 @@ class UsersProfile extends StatelessWidget {
                         }
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                     ),
                   ])),
@@ -341,10 +412,16 @@ class UsersProfile extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 5,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      color: CacheHelper.getValue(key: 'lightMode') == false
+          ? const Color.fromARGB(126, 17, 17, 17)
+          : Colors.white,
+      margin: const EdgeInsets.symmetric(horizontal: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 5,
+          ),
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
@@ -378,7 +455,14 @@ class UsersProfile extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText1!
-                                .copyWith(fontSize: 15),
+                                .copyWith(
+                                  fontSize: 15,
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                ),
                           ),
                         if (SocialCubit.get(context)
                                 .getUserInfo(post.uId, 'name') !=
@@ -389,37 +473,122 @@ class UsersProfile extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText1!
-                                .copyWith(fontSize: 15),
+                                .copyWith(
+                                  fontSize: 15,
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                ),
                           ),
                         const SizedBox(
                           width: 3,
                         ),
-                        const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 8,
-                          child: Icon(
-                            Icons.check_circle,
-                            size: 20,
-                          ),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 20,
+                          color: Colors.blue,
                         )
                       ],
                     ),
                     const SizedBox(
                       height: 2,
                     ),
-                    Text(
-                      '${numberToMonth[time.month]} ${time.day} at ${time.hour}:${time.minute}',
-                      style: Theme.of(context).textTheme.caption,
+                    Row(
+                      children: [
+                        Text(
+                          '${numberToMonth[time.month]} ${time.day} at ${time.hour}:${time.minute}',
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        if (post.saved == true)
+                          Icon(
+                            Icons.flag,
+                            size: 18,
+                            color:
+                                CacheHelper.getValue(key: 'lightMode') == true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                          ),
+                      ],
                     )
                   ],
                 ),
                 const Spacer(),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.more_horiz,
-                      size: 22,
-                    ))
+                PopupMenuButton(
+                  icon: Icon(
+                    Icons.adaptive.more,
+                    color: CacheHelper.getValue(key: 'lightMode') == true
+                        ? lightTextColor
+                        : darkTextcolor,
+                  ),
+                  itemBuilder: (context) => [
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: edit,
+                        child: Text(
+                          edit,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
+                      ),
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: delete,
+                        child: Text(
+                          delete,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
+                      ),
+                    PopupMenuItem(
+                      value: SocialCubit.get(context).save,
+                      child: Text(
+                        post.saved ? 'Unsave' : 'save',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontSize: 12, color: Colors.blue),
+                      ),
+                    ),
+                  ],
+                  onSelected: (String s) {
+                    if (s == delete) {
+                      SocialCubit.get(context).deletePost(post.postId);
+                    } else if (s == edit) {
+                      SocialCubit.get(context).postImage = null;
+                      editPostButton(
+                          context: context,
+                          post: post,
+                          index: index,
+                          beforepick: true);
+                    } else {
+                      if (post.saved == true) {
+                        post.saved == false;
+                        SocialCubit.get(context).savePost(post.postId, false);
+                        SocialCubit.get(context).realTimeSavePost(index, false);
+                      } else {
+                        post.saved == true;
+                        SocialCubit.get(context).savePost(post.postId, true);
+                        SocialCubit.get(context).realTimeSavePost(index, true);
+                      }
+                    }
+                  },
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                ),
               ],
             ),
           ),
@@ -440,10 +609,12 @@ class UsersProfile extends StatelessWidget {
                   right: 12, left: 12, top: 10, bottom: 3),
               child: Text(
                 post.text,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: Colors.black, fontWeight: FontWeight.w500),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontWeight: FontWeight.w500,
+                    ),
               ),
             ),
           if (false)
@@ -566,7 +737,16 @@ class UsersProfile extends StatelessWidget {
                           ),
                           Text(
                             post.likes_num.toString(),
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                ),
                           ),
                         ],
                       ),
@@ -598,12 +778,28 @@ class UsersProfile extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 3),
                             child: Text(
                               post.comments_num.toString(),
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             ),
                           ),
                           Text(
                             'comments',
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                ),
                           ),
                         ],
                       ),
@@ -660,7 +856,12 @@ class UsersProfile extends StatelessWidget {
                         ),
                         Text(
                           'write a comment..',
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                       ],
                     ),
@@ -706,7 +907,16 @@ class UsersProfile extends StatelessWidget {
                                 ),
                                 Text(
                                   'Like',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -735,7 +945,16 @@ class UsersProfile extends StatelessWidget {
                                 ),
                                 Text(
                                   'Share',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -750,6 +969,285 @@ class UsersProfile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  editPostButton(
+      {required BuildContext context,
+      required PostModel post,
+      required int index,
+      required bool beforepick}) {
+    if (beforepick) {
+      SocialCubit.get(context).postImage = null;
+      postEditingCtrl.text = post.text;
+    }
+    if (!beforepick) {
+      Navigator.pop(context);
+    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+        top: Radius.circular(30),
+      )),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+          child: Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: postEditingCtrl,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: post.text == '' ? 'Write a comment..' : '',
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .caption!
+                        .copyWith(fontSize: 12),
+                  ),
+                ),
+                if (post.postImage != '')
+                  const SizedBox(
+                    height: 5,
+                  ),
+                if (SocialCubit.get(context).postImage == null &&
+                    SocialCubit.get(context).posts[index].postImage != '')
+                  Stack(
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      Container(
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Image(
+                          image: NetworkImage(
+                              SocialCubit.get(context).posts[index].postImage),
+                          width: double.maxFinite,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .getPhotoFromGallary(image: 'post')
+                                      .then((value) {
+                                    Timer(const Duration(seconds: 2), () {
+                                      // Navigator.pop(context);
+                                      editPostButton(
+                                        context: context,
+                                        post: post,
+                                        index: index,
+                                        beforepick: false,
+                                      );
+                                    });
+                                  });
+                                },
+                                icon: Icon(Icons.edit),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .posts[index]
+                                      .postImage = '';
+                                  SocialCubit.get(context)
+                                      .clearImage(clear: true);
+                                  editPostButton(
+                                    context: context,
+                                    post: post,
+                                    index: index,
+                                    beforepick: false,
+                                  );
+                                },
+                                icon: Icon(Icons.close),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                if (SocialCubit.get(context).postImage != null)
+                  Stack(
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      Container(
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Image(
+                          image: FileImage(SocialCubit.get(context).postImage!),
+                          width: double.maxFinite,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .getPhotoFromGallary(image: 'post')
+                                      .then((value) {
+                                    Timer(const Duration(seconds: 2), () {
+                                      // Navigator.pop(context);
+                                      editPostButton(
+                                        context: context,
+                                        post: post,
+                                        index: index,
+                                        beforepick: false,
+                                      );
+                                    });
+                                  });
+                                },
+                                icon: Icon(Icons.edit),
+                                color: defaultColor,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .posts[index]
+                                      .postImage = '';
+                                  SocialCubit.get(context)
+                                      .clearImage(clear: true);
+                                  editPostButton(
+                                    context: context,
+                                    post: post,
+                                    index: index,
+                                    beforepick: false,
+                                  );
+                                },
+                                icon: Icon(Icons.close),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                if (SocialCubit.get(context).posts[index].postImage == '' &&
+                    SocialCubit.get(context).postImage == null)
+                  OutlinedButton(
+                      onPressed: () {
+                        SocialCubit.get(context)
+                            .getPhotoFromGallary(image: 'post')
+                            .then((value) {
+                          Timer(const Duration(seconds: 2), () {
+                            // Navigator.pop(context);
+                            editPostButton(
+                              context: context,
+                              post: post,
+                              index: index,
+                              beforepick: false,
+                            );
+                          });
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.add_photo_alternate,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Add Photo',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(fontSize: 16, color: Colors.blue),
+                          ),
+                        ],
+                      )),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 40,
+                  width: double.maxFinite,
+                  child: OutlinedButton(
+                      onPressed: () {
+                        if (SocialCubit.get(context).postImage == null) {
+                          if (SocialCubit.get(context).commentImageCleared) {
+                            SocialCubit.get(context).editPost(post.postId, {
+                              'text': postEditingCtrl.text,
+                              'postImage': ''
+                            });
+                          } else {
+                            SocialCubit.get(context).editPost(
+                                post.postId, {'text': postEditingCtrl.text});
+                          }
+                          // return commentImageCleared to normal value
+                          SocialCubit.get(context).clearImage(clear: false);
+                        } else {
+                          SocialCubit.get(context).editPostWithImage(
+                              postId: post.postId, text: postEditingCtrl.text);
+                        }
+                        SocialCubit.get(context).postImage = null;
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.tips_and_updates,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Update',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(fontSize: 16, color: Colors.blue),
+                          ),
+                        ],
+                      )),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,7 @@ import 'package:social_app/modules/Likes/postLikesScreen.dart';
 import 'package:social_app/modules/UsersProfile/usersProfile.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
 import 'package:social_app/shared/styles/colors.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
@@ -193,16 +195,19 @@ class FeedsScreen extends StatelessWidget {
     int index,
     DateTime time,
   ) {
-    print(post.text);
-    print(SocialCubit.get(context).posts[index].userWhoLikeIds);
-    print(SocialCubit.get(context).user!.uId);
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 5,
       margin: const EdgeInsets.symmetric(horizontal: 8),
+      color: CacheHelper.getValue(key: 'lightMode') == false
+          ? const Color.fromARGB(126, 17, 17, 17)
+          : Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 5,
+          ),
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
@@ -260,7 +265,14 @@ class FeedsScreen extends StatelessWidget {
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1!
-                                  .copyWith(fontSize: 15),
+                                  .copyWith(
+                                    fontSize: 15,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
+                                  ),
                             ),
                           ),
                         if (SocialCubit.get(context)
@@ -284,19 +296,23 @@ class FeedsScreen extends StatelessWidget {
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1!
-                                  .copyWith(fontSize: 15),
+                                  .copyWith(
+                                    fontSize: 15,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
+                                  ),
                             ),
                           ),
                         const SizedBox(
                           width: 3,
                         ),
-                        const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 8,
-                          child: Icon(
-                            Icons.check_circle,
-                            size: 20,
-                          ),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 20,
+                          color: Colors.blue,
                         )
                       ],
                     ),
@@ -307,15 +323,24 @@ class FeedsScreen extends StatelessWidget {
                       children: [
                         Text(
                           '${numberToMonth[time.month]} ${time.day} at ${time.hour}:${time.minute}',
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                         const SizedBox(
                           width: 10,
                         ),
                         if (post.saved == true)
-                          const Icon(
+                          Icon(
                             Icons.flag,
                             size: 18,
+                            color:
+                                CacheHelper.getValue(key: 'lightMode') == true
+                                    ? lightTextColor
+                                    : darkTextcolor,
                           ),
                       ],
                     )
@@ -323,27 +348,35 @@ class FeedsScreen extends StatelessWidget {
                 ),
                 const Spacer(),
                 PopupMenuButton(
+                  icon: Icon(
+                    Icons.adaptive.more,
+                    color: CacheHelper.getValue(key: 'lightMode') == true
+                        ? lightTextColor
+                        : darkTextcolor,
+                  ),
                   itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: edit,
-                      child: Text(
-                        edit,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1!
-                            .copyWith(fontSize: 12, color: Colors.blue),
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: edit,
+                        child: Text(
+                          edit,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
                       ),
-                    ),
-                    PopupMenuItem(
-                      value: delete,
-                      child: Text(
-                        delete,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1!
-                            .copyWith(fontSize: 12, color: Colors.blue),
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: delete,
+                        child: Text(
+                          delete,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
                       ),
-                    ),
                     PopupMenuItem(
                       value: SocialCubit.get(context).save,
                       child: Text(
@@ -400,83 +433,12 @@ class FeedsScreen extends StatelessWidget {
                   right: 12, left: 12, top: 10, bottom: 3),
               child: Text(
                 post.text,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: Colors.black, fontWeight: FontWeight.w500),
-              ),
-            ),
-          if (false)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Wrap(
-                children: [
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter_Development',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           if (post.postImage != '')
@@ -540,7 +502,14 @@ class FeedsScreen extends StatelessWidget {
                             ),
                             Text(
                               post.likes_num.toString(),
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             ),
                           ],
                         ),
@@ -576,18 +545,34 @@ class FeedsScreen extends StatelessWidget {
                                   const EdgeInsets.symmetric(horizontal: 3),
                               child: Text(
                                 post.comments_num.toString(),
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      color: CacheHelper.getValue(
+                                                  key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                    ),
                               ),
                             ),
                             Text(
                               'comments',
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                 ],
@@ -629,20 +614,20 @@ class FeedsScreen extends StatelessWidget {
                           ),
                           child: CircleAvatar(
                               radius: 18,
-                              backgroundImage: NetworkImage(SocialCubit.get(
-                                              context)
-                                          .user!
-                                          .userImage !=
-                                      null
-                                  ? SocialCubit.get(context).user!.userImage
-                                  : 'https://c.files.bbci.co.uk/10E5A/production/_105901296_male.jpg')),
+                              backgroundImage: NetworkImage(
+                                  SocialCubit.get(context).user!.userImage)),
                         ),
                         const SizedBox(
                           width: 5,
                         ),
                         Text(
                           'write a comment..',
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                       ],
                     ),
@@ -690,7 +675,16 @@ class FeedsScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   'Like',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -719,7 +713,16 @@ class FeedsScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   'Share',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),

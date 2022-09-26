@@ -10,6 +10,8 @@ import 'package:searchbar_animation/searchbar_animation.dart';
 import 'package:social_app/modules/UsersProfile/usersProfile.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
+import 'package:social_app/shared/styles/colors.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen({Key? key}) : super(key: key);
@@ -34,9 +36,11 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Scaffold(
           appBar: AppBar(
             leading: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new,
-                color: Colors.black,
+                color: CacheHelper.getValue(key: 'lightMode') == false
+                    ? darkTextcolor
+                    : lightTextColor,
               ),
               onPressed: () {
                 searchCtrl.text = '';
@@ -99,8 +103,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                           data['name'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              color: Colors.black,
+                                          style: TextStyle(
+                                              color: CacheHelper.getValue(
+                                                          key: 'lightMode') ==
+                                                      false
+                                                  ? darkTextcolor
+                                                  : lightTextColor,
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -108,8 +116,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                           data['email'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              color: Colors.black45,
+                                          style: TextStyle(
+                                              color: CacheHelper.getValue(
+                                                          key: 'lightMode') ==
+                                                      false
+                                                  ? Colors.grey[400]
+                                                  : lightTextColor,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -154,8 +166,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                           data['name'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              color: Colors.black,
+                                          style: TextStyle(
+                                              color: CacheHelper.getValue(
+                                                          key: 'lightMode') ==
+                                                      false
+                                                  ? darkTextcolor
+                                                  : lightTextColor,
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -163,8 +179,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                           data['email'],
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              color: Colors.black54,
+                                          style: TextStyle(
+                                              color: CacheHelper.getValue(
+                                                          key: 'lightMode') ==
+                                                      false
+                                                  ? Colors.grey[400]
+                                                  : lightTextColor,
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -173,6 +193,19 @@ class _SearchScreenState extends State<SearchScreen> {
                                               NetworkImage(data['userImage']),
                                           radius: 30,
                                         ),
+                                        onTap: () {
+                                          SocialCubit.get(context)
+                                              .getMyPosts(data['uId']);
+                                          SocialCubit.get(context)
+                                              .searchForPostsForMe(true);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UsersProfile(
+                                                        userUid: data['uId']),
+                                              ));
+                                        },
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(

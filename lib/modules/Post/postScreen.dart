@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/models/App/postModel.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
 import 'package:social_app/shared/styles/colors.dart';
 
 class PostScreen extends StatefulWidget {
@@ -33,16 +34,26 @@ class _PostScreenState extends State<PostScreen> {
 
         print('postScreen: postImage : ${cubit.postImage}');
         return Scaffold(
+            backgroundColor: CacheHelper.getValue(key: 'lightMode') == true
+                ? Colors.white
+                : darkBackground,
             appBar: AppBar(
-              title: const Text(
+              title: Text(
                 'Create Post',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: CacheHelper.getValue(key: 'lightMode') == true
+                      ? lightTextColor
+                      : darkTextcolor,
+                ),
               ),
               titleSpacing: 0,
               leading: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios,
-                  color: Colors.black,
+                  color: CacheHelper.getValue(key: 'lightMode') == true
+                      ? lightTextColor
+                      : darkTextcolor,
                 ),
                 onPressed: () {
                   cubit.postImage = null;
@@ -57,10 +68,9 @@ class _PostScreenState extends State<PostScreen> {
                     },
                     child: Text(
                       'Post',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(fontSize: 16),
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            fontSize: 16,
+                          ),
                     )),
                 const SizedBox(
                   width: 8,
@@ -103,7 +113,14 @@ class _PostScreenState extends State<PostScreen> {
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1!
-                                  .copyWith(fontSize: 16),
+                                  .copyWith(
+                                    fontSize: 16,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
+                                  ),
                             ),
                           ]),
                     ),
@@ -111,7 +128,8 @@ class _PostScreenState extends State<PostScreen> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 20),
                             child: Container(
                               width: double.infinity,
                               height: 160,
@@ -126,7 +144,14 @@ class _PostScreenState extends State<PostScreen> {
                                   hintStyle: Theme.of(context)
                                       .textTheme
                                       .caption!
-                                      .copyWith(fontSize: 14),
+                                      .copyWith(
+                                        fontSize: 14,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : Colors.grey[400],
+                                      ),
                                 ),
                               ),
                             ),
@@ -185,7 +210,14 @@ class _PostScreenState extends State<PostScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium!
-                                        .copyWith(fontSize: 14),
+                                        .copyWith(
+                                          fontSize: 14,
+                                          color: CacheHelper.getValue(
+                                                      key: 'lightMode') ==
+                                                  true
+                                              ? lightTextColor
+                                              : darkTextcolor,
+                                        ),
                                   )
                                 ],
                               ),
@@ -200,7 +232,14 @@ class _PostScreenState extends State<PostScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!
-                                    .copyWith(fontSize: 14),
+                                    .copyWith(
+                                      fontSize: 14,
+                                      color: CacheHelper.getValue(
+                                                  key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                    ),
                               )),
                         )
                       ],

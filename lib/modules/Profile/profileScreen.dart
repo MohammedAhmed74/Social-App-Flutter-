@@ -15,12 +15,18 @@ import 'package:social_app/modules/Post/postScreen.dart';
 import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/styles/colors.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
+
+import '../../shared/network/cacheHelper.dart';
 
 class ProfileScreen extends StatelessWidget {
   var emailCtrl = TextEditingController();
   var phoneCtrl = TextEditingController();
   var nameCtrl = TextEditingController();
+  String edit = 'Edit';
+  String delete = 'Delete';
+  var postEditingCtrl = TextEditingController();
   Map numberToMonth = {
     1: 'Jan',
     2: 'Feb',
@@ -38,11 +44,18 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SocialCubit, SocialStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is ErrorPickedImageState) {
+          SocialCubit.get(context).pickedImage(false);
+        }
+        if (state is SuccessPickedImageState) {
+          SocialCubit.get(context).pickedImage(true);
+        }
+      },
       builder: (context, state) {
         var cubit = SocialCubit.get(context);
         return SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -107,10 +120,12 @@ class ProfileScreen extends StatelessWidget {
                   child: Text(
                     cubit.user!.name,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(fontSize: 18),
+                    style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                          fontSize: 18,
+                          color: CacheHelper.getValue(key: 'lightMode') == false
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                   ),
                 ),
                 const SizedBox(
@@ -119,16 +134,19 @@ class ProfileScreen extends StatelessWidget {
                 Container(
                   width: 300,
                   child: Align(
+                    alignment: AlignmentDirectional.center,
                     child: Text(
                       cubit.user!.bio,
                       textAlign: TextAlign.center,
                       maxLines: 3,
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption!
-                          .copyWith(fontSize: 14),
+                      style: Theme.of(context).textTheme.caption!.copyWith(
+                            fontSize: 14,
+                            color:
+                                CacheHelper.getValue(key: 'lightMode') == true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                          ),
                     ),
-                    alignment: AlignmentDirectional.center,
                   ),
                 ),
                 Padding(
@@ -144,12 +162,23 @@ class ProfileScreen extends StatelessWidget {
                                   .textTheme
                                   .bodyMedium!
                                   .copyWith(
-                                    color: Colors.black,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
                                   ),
                             ),
                             Text(
                               'Posts',
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             )
                           ],
                         ),
@@ -163,12 +192,23 @@ class ProfileScreen extends StatelessWidget {
                                   .textTheme
                                   .bodyMedium!
                                   .copyWith(
-                                    color: Colors.black,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
                                   ),
                             ),
                             Text(
                               'Photos',
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             )
                           ],
                         ),
@@ -182,12 +222,23 @@ class ProfileScreen extends StatelessWidget {
                                   .textTheme
                                   .bodyMedium!
                                   .copyWith(
-                                    color: Colors.black,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
                                   ),
                             ),
                             Text(
                               'Followers',
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             )
                           ],
                         ),
@@ -201,12 +252,23 @@ class ProfileScreen extends StatelessWidget {
                                   .textTheme
                                   .bodyMedium!
                                   .copyWith(
-                                    color: Colors.black,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? lightTextColor
+                                        : darkTextcolor,
                                   ),
                             ),
                             Text(
                               'Following',
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             )
                           ],
                         ),
@@ -215,66 +277,87 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
                   child: Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: ((context) =>
-                                          const PostScreen())));
-                            },
-                            child: Text(
-                              'Add Posts',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: Colors.blue,
-                                  ),
-                            )),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      OutlinedButton(
                           onPressed: () {
-                            cubit.errorCoverUpdate = false;
-                            cubit.errorProfileUpdate = false;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: ((context) =>
-                                        EditProfileScreen())));
+                                        const PostScreen())));
                           },
-                          child: Icon(Icons.edit_outlined)),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor:
+                                CacheHelper.getValue(key: 'lightMode') == false
+                                    ? Colors.black26
+                                    : Colors.white,
+                          ),
+                          child: Text(
+                            'Add Posts',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: Colors.blue,
+                                ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(
                         width: 10,
                       ),
                       OutlinedButton(
-                          onPressed: () {
-                            if (!cubit.signOut) {
-                              Fluttertoast.showToast(
-                                  msg: 'press again to signOut',
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  backgroundColor: Colors.green.withOpacity(1),
-                                  textColor: Colors.white,
-                                  fontSize: 16.0);
-                              cubit.doSignOut(true);
-                            } else {
-                              cubit.logOut(context);
-                            }
-                          },
-                          child: Icon(Icons.logout_outlined)),
+                        onPressed: () {
+                          cubit.errorCoverUpdate = false;
+                          cubit.errorProfileUpdate = false;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) =>
+                                      const EditProfileScreen())));
+                        },
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor:
+                              CacheHelper.getValue(key: 'lightMode') == false
+                                  ? Colors.black26
+                                  : Colors.white,
+                        ),
+                        child: const Icon(Icons.edit_outlined),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      OutlinedButton(
+                        onPressed: () {
+                          if (!cubit.signOut) {
+                            Fluttertoast.showToast(
+                                msg: 'press again to signOut',
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.green.withOpacity(1),
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                            cubit.doSignOut(true);
+                          } else {
+                            cubit.logOut(context);
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor:
+                              CacheHelper.getValue(key: 'lightMode') == false
+                                  ? Colors.black26
+                                  : Colors.white,
+                        ),
+                        child: const Icon(Icons.logout_outlined),
+                      ),
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 ConditionalBuilder(
@@ -307,7 +390,7 @@ class ProfileScreen extends StatelessWidget {
                         cubit.searchForPostsForMe(false);
                       });
                       return Column(
-                        children: [
+                        children: const [
                           SizedBox(
                             height: 100,
                           ),
@@ -321,7 +404,7 @@ class ProfileScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 height: 50,
                               ),
                               Lottie.network(
@@ -364,17 +447,23 @@ class ProfileScreen extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 5,
-      margin: EdgeInsets.symmetric(horizontal: 8),
+      color: CacheHelper.getValue(key: 'lightMode') == false
+          ? const Color.fromARGB(126, 17, 17, 17)
+          : Colors.white,
+      margin: const EdgeInsets.symmetric(horizontal: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 5,
+          ),
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: CircleAvatar(
                       radius: 24,
                       backgroundImage: NetworkImage(SocialCubit.get(context)
@@ -401,7 +490,14 @@ class ProfileScreen extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText1!
-                                .copyWith(fontSize: 15),
+                                .copyWith(
+                                  fontSize: 15,
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              false
+                                          ? darkTextcolor
+                                          : lightTextColor,
+                                ),
                           ),
                         if (SocialCubit.get(context)
                                 .getUserInfo(post.uId, 'name') !=
@@ -412,37 +508,121 @@ class ProfileScreen extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyText1!
-                                .copyWith(fontSize: 15),
+                                .copyWith(
+                                  fontSize: 15,
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              false
+                                          ? darkTextcolor
+                                          : lightTextColor,
+                                ),
                           ),
                         const SizedBox(
                           width: 3,
                         ),
-                        const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 8,
-                          child: Icon(
-                            Icons.check_circle,
-                            size: 20,
-                          ),
+                        const Icon(
+                          Icons.check_circle,
+                          size: 20,
+                          color: Colors.blue,
                         )
                       ],
                     ),
                     const SizedBox(
                       height: 2,
                     ),
-                    Text(
-                      '${numberToMonth[time.month]} ${time.day} at ${time.hour}:${time.minute}',
-                      style: Theme.of(context).textTheme.caption,
+                    Row(
+                      children: [
+                        Text(
+                          '${numberToMonth[time.month]} ${time.day} at ${time.hour}:${time.minute}',
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        if (post.saved == true)
+                           Icon(
+                            Icons.flag,
+                            size: 18,
+                            color: CacheHelper.getValue(key: 'lightMode') == true
+                        ? lightTextColor
+                        : darkTextcolor,
+                          ),
+                      ],
                     )
                   ],
                 ),
                 const Spacer(),
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.more_horiz,
-                      size: 22,
-                    ))
+                PopupMenuButton(
+                  icon: Icon(
+                    Icons.adaptive.more,
+                    color: CacheHelper.getValue(key: 'lightMode') == true
+                        ? lightTextColor
+                        : darkTextcolor,
+                  ),
+                  itemBuilder: (context) => [
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: edit,
+                        child: Text(
+                          edit,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
+                      ),
+                    if (post.uId == SocialCubit.get(context).user!.uId)
+                      PopupMenuItem(
+                        value: delete,
+                        child: Text(
+                          delete,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(fontSize: 12, color: Colors.blue),
+                        ),
+                      ),
+                    PopupMenuItem(
+                      value: SocialCubit.get(context).save,
+                      child: Text(
+                        post.saved ? 'Unsave' : 'save',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontSize: 12, color: Colors.blue),
+                      ),
+                    ),
+                  ],
+                  onSelected: (String s) {
+                    if (s == delete) {
+                      SocialCubit.get(context).deletePost(post.postId);
+                    } else if (s == edit) {
+                      SocialCubit.get(context).postImage = null;
+                      editPostButton(
+                          context: context,
+                          post: post,
+                          index: index,
+                          beforepick: true);
+                    } else {
+                      if (post.saved == true) {
+                        SocialCubit.get(context).savePost(post.postId, false);
+                        SocialCubit.get(context).realTimeSavePost(index, false);
+                        post.saved == false;
+                      } else {
+                        SocialCubit.get(context).savePost(post.postId, true);
+                        SocialCubit.get(context).realTimeSavePost(index, true);
+                        post.saved == true;
+                      }
+                    }
+                  },
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                ),
               ],
             ),
           ),
@@ -459,86 +639,14 @@ class ProfileScreen extends StatelessWidget {
           ),
           if (post.text != '')
             Padding(
-              padding: EdgeInsets.only(right: 12, left: 12, top: 10, bottom: 3),
+              padding: const EdgeInsets.only(
+                  right: 12, left: 12, top: 10, bottom: 3),
               child: Text(
                 post.text,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!
                     .copyWith(color: Colors.black, fontWeight: FontWeight.w500),
-              ),
-            ),
-          if (false)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Wrap(
-                children: [
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 25,
-                    child: MaterialButton(
-                      onPressed: () {},
-                      minWidth: 1,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        '#Flutter_Development',
-                        style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           if (post.postImage != '')
@@ -565,7 +673,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           if (post.likes_num > 0 || post.comments_num > 0)
@@ -588,7 +696,16 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           Text(
                             post.likes_num.toString(),
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              false
+                                          ? darkTextcolor
+                                          : lightTextColor,
+                                ),
                           ),
                         ],
                       ),
@@ -620,12 +737,28 @@ class ProfileScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 3),
                             child: Text(
                               post.comments_num.toString(),
-                              style: Theme.of(context).textTheme.caption,
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             ),
                           ),
                           Text(
                             'comments',
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context)
+                                .textTheme
+                                .caption!
+                                .copyWith(
+                                  color:
+                                      CacheHelper.getValue(key: 'lightMode') ==
+                                              false
+                                          ? darkTextcolor
+                                          : lightTextColor,
+                                ),
                           ),
                         ],
                       ),
@@ -682,7 +815,12 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         Text(
                           'write a comment..',
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                       ],
                     ),
@@ -698,8 +836,6 @@ class ProfileScreen extends StatelessWidget {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            SocialCubit.get(context).posts[index].iLikeIt =
-                                !SocialCubit.get(context).posts[index].iLikeIt;
                             SocialCubit.get(context).likePost(post.postId,
                                 SocialCubit.get(context).user!.uId, index);
                           },
@@ -728,7 +864,16 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   'Like',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -757,7 +902,16 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   'Share',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -772,6 +926,285 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  editPostButton(
+      {required BuildContext context,
+      required PostModel post,
+      required int index,
+      required bool beforepick}) {
+    if (beforepick) {
+      SocialCubit.get(context).postImage = null;
+      postEditingCtrl.text = post.text;
+    }
+    if (!beforepick) {
+      Navigator.pop(context);
+    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+        top: Radius.circular(30),
+      )),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+          child: Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: postEditingCtrl,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(fontSize: 14, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: post.text == '' ? 'Write a comment..' : '',
+                    hintStyle: Theme.of(context)
+                        .textTheme
+                        .caption!
+                        .copyWith(fontSize: 12),
+                  ),
+                ),
+                if (post.postImage != '')
+                  const SizedBox(
+                    height: 5,
+                  ),
+                if (SocialCubit.get(context).postImage == null &&
+                    SocialCubit.get(context).posts[index].postImage != '')
+                  Stack(
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      Container(
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Image(
+                          image: NetworkImage(
+                              SocialCubit.get(context).posts[index].postImage),
+                          width: double.maxFinite,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .getPhotoFromGallary(image: 'post')
+                                      .then((value) {
+                                    Timer(const Duration(seconds: 2), () {
+                                      // Navigator.pop(context);
+                                      editPostButton(
+                                        context: context,
+                                        post: post,
+                                        index: index,
+                                        beforepick: false,
+                                      );
+                                    });
+                                  });
+                                },
+                                icon: Icon(Icons.edit),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .posts[index]
+                                      .postImage = '';
+                                  SocialCubit.get(context)
+                                      .clearImage(clear: true);
+                                  editPostButton(
+                                    context: context,
+                                    post: post,
+                                    index: index,
+                                    beforepick: false,
+                                  );
+                                },
+                                icon: Icon(Icons.close),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                if (SocialCubit.get(context).postImage != null)
+                  Stack(
+                    alignment: AlignmentDirectional.topEnd,
+                    children: [
+                      Container(
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Image(
+                          image: FileImage(SocialCubit.get(context).postImage!),
+                          width: double.maxFinite,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .getPhotoFromGallary(image: 'post')
+                                      .then((value) {
+                                    Timer(const Duration(seconds: 2), () {
+                                      // Navigator.pop(context);
+                                      editPostButton(
+                                        context: context,
+                                        post: post,
+                                        index: index,
+                                        beforepick: false,
+                                      );
+                                    });
+                                  });
+                                },
+                                icon: Icon(Icons.edit),
+                                color: defaultColor,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white.withOpacity(0.4),
+                              child: IconButton(
+                                onPressed: () {
+                                  SocialCubit.get(context)
+                                      .posts[index]
+                                      .postImage = '';
+                                  SocialCubit.get(context)
+                                      .clearImage(clear: true);
+                                  editPostButton(
+                                    context: context,
+                                    post: post,
+                                    index: index,
+                                    beforepick: false,
+                                  );
+                                },
+                                icon: Icon(Icons.close),
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                if (SocialCubit.get(context).posts[index].postImage == '' &&
+                    SocialCubit.get(context).postImage == null)
+                  OutlinedButton(
+                      onPressed: () {
+                        SocialCubit.get(context)
+                            .getPhotoFromGallary(image: 'post')
+                            .then((value) {
+                          Timer(const Duration(seconds: 2), () {
+                            // Navigator.pop(context);
+                            editPostButton(
+                              context: context,
+                              post: post,
+                              index: index,
+                              beforepick: false,
+                            );
+                          });
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.add_photo_alternate,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Add Photo',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(fontSize: 16, color: Colors.blue),
+                          ),
+                        ],
+                      )),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 40,
+                  width: double.maxFinite,
+                  child: OutlinedButton(
+                      onPressed: () {
+                        if (SocialCubit.get(context).postImage == null) {
+                          if (SocialCubit.get(context).commentImageCleared) {
+                            SocialCubit.get(context).editPost(post.postId, {
+                              'text': postEditingCtrl.text,
+                              'postImage': ''
+                            });
+                          } else {
+                            SocialCubit.get(context).editPost(
+                                post.postId, {'text': postEditingCtrl.text});
+                          }
+                          // return commentImageCleared to normal value
+                          SocialCubit.get(context).clearImage(clear: false);
+                        } else {
+                          SocialCubit.get(context).editPostWithImage(
+                              postId: post.postId, text: postEditingCtrl.text);
+                        }
+                        SocialCubit.get(context).postImage = null;
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.tips_and_updates,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            'Update',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(fontSize: 16, color: Colors.blue),
+                          ),
+                        ],
+                      )),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

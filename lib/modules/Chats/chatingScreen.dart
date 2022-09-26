@@ -57,7 +57,7 @@ class ChatingScreen extends StatelessWidget {
                 ),
                 Text(
                   receiver.name,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
@@ -92,10 +92,15 @@ class ChatingScreen extends StatelessWidget {
                             ),
                             Text(
                               'Send a message for ${receiver.name}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption!
-                                  .copyWith(fontSize: 14),
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        fontSize: 14,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                             ),
                             const SizedBox(
                               height: 60,
@@ -109,7 +114,7 @@ class ChatingScreen extends StatelessWidget {
                     return Expanded(
                         child: ListView.separated(
                             reverse: true,
-                            physics: BouncingScrollPhysics(),
+                            physics: const BouncingScrollPhysics(),
                             itemBuilder: ((context, index) {
                               List<String> msgTime =
                                   cubit.messages[index].dateTime.split(' ');
@@ -156,14 +161,18 @@ class ChatingScreen extends StatelessWidget {
                                         .bodyText1!
                                         .copyWith(
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w500),
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black),
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'write your message..',
                                       hintStyle: Theme.of(context)
                                           .textTheme
                                           .caption!
-                                          .copyWith(fontSize: 14),
+                                          .copyWith(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -260,7 +269,6 @@ class ChatingScreen extends StatelessWidget {
                               messageCtrl.text = '';
                               cubit.uploadMessage(msg, receiver);
                             } else {
-                              print('elseeeeeee');
                               cubit.uploadMessageImage();
                               // cubit.messages = [];
                               // cubit.getMessages(receiver.uId,
@@ -270,7 +278,7 @@ class ChatingScreen extends StatelessWidget {
                               //     message: messageCtrl.text);
                             }
                           },
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.send_outlined,
                             color: Colors.white,
                             size: 25,
@@ -384,7 +392,7 @@ class ChatingScreen extends StatelessWidget {
               ],
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             child: Text(
@@ -426,7 +434,7 @@ class ChatingScreen extends StatelessWidget {
                   fontWeight: FontWeight.w300),
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
             child: Column(

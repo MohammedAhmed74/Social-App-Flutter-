@@ -27,8 +27,7 @@ class UserModel {
     this.bio = 'this is my bio',
     this.userImage =
         'https://c.files.bbci.co.uk/10E5A/production/_105901296_male.jpg',
-    this.cover =
-        'https://c.files.bbci.co.uk/10E5A/production/_105901296_male.jpg',
+    this.cover = 'https://www.drodd.com/images14/white3.jpg',
   });
 
   Map<String, dynamic> toMap() {

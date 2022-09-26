@@ -82,6 +82,15 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(ChangeNavState());
   }
 
+  void changeLightMode() {
+    CacheHelper.setValue(
+        key: 'lightMode',
+        value: CacheHelper.getValue(key: 'lightMode') == null
+            ? true
+            : !CacheHelper.getValue(key: 'lightMode'));
+    emit(ChangeLightModeState());
+  }
+
   void createPostButton(BuildContext context) {
     postImage = null;
     Navigator.push(

@@ -7,7 +7,6 @@ import 'package:social_app/modules/Login/cubit/states.dart';
 import 'package:social_app/modules/Login/loginScreen.dart';
 import 'package:social_app/shared/bloc_observer.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
-import 'package:social_app/shared/cubit/socialStates.dart';
 import 'package:social_app/shared/network/cacheHelper.dart';
 import 'package:social_app/shared/styles/themes.dart';
 
@@ -16,8 +15,10 @@ void main() async {
   await Firebase.initializeApp();
   Bloc.observer = MyBlocObserver();
   await CacheHelper.init();
-  print(CacheHelper.getValue(key: 'uId'));
-  runApp(MyApp());
+  if (CacheHelper.getValue(key: 'lightMode') == null) {
+    CacheHelper.setValue(key: 'lightMode', value: true);
+  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -40,8 +41,10 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
-          theme: lightTheme,
-          // theme: CacheHelper.getValue(key: 'lightMode') == true? lightTheme : darkTheme,
+          // theme: lightTheme,
+          theme: CacheHelper.getValue(key: 'lightMode') == false
+              ? darkTheme
+              : lightTheme,
           home: CacheHelper.getValue(key: 'uId') == null
               ? LoginScreen()
               : SocialLayout(),

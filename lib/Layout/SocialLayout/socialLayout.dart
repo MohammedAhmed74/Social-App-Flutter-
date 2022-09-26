@@ -1,31 +1,38 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_app/modules/EditProfileData/editProfileScreen.dart';
 import 'package:social_app/modules/Login/cubit/states.dart';
 import 'package:social_app/modules/Search/searchScreen.dart';
-import 'package:social_app/shared/components/components.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
+import 'package:social_app/shared/styles/colors.dart';
 
-class SocialLayout extends StatelessWidget {
+class SocialLayout extends StatefulWidget {
   SocialLayout({
     Key? key,
     this.login = false,
   }) : super(key: key);
   bool login;
+
+  @override
+  State<SocialLayout> createState() => _SocialLayoutState();
+}
+
+class _SocialLayoutState extends State<SocialLayout> {
+  @override
+  void initState() {}
+
   @override
   Widget build(BuildContext context) {
-    if (login) {
+    if (widget.login) {
       SocialCubit.get(context).user = null;
       SocialCubit.get(context).changeBottomNav(0, context);
       SocialCubit.get(context).getUserData();
-      login = false;
+      widget.login = false;
     }
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
@@ -39,16 +46,40 @@ class SocialLayout extends StatelessWidget {
               print(cubit.user!.name);
               return SafeArea(
                 child: Scaffold(
+                  backgroundColor:
+                      CacheHelper.getValue(key: 'lightMode') == true
+                          ? Colors.white
+                          : darkBackground,
                   appBar: AppBar(
-                      title: Text(cubit.titles[cubit.currentIndex]),
-                      iconTheme: const IconThemeData(color: Colors.black),
+                      backgroundColor:
+                          CacheHelper.getValue(key: 'lightMode') == true
+                              ? Colors.white
+                              : darkBackground,
+                      title: Text(
+                        cubit.titles[cubit.currentIndex],
+                        style: TextStyle(
+                          color: CacheHelper.getValue(key: 'lightMode') == true
+                              ? lightTextColor
+                              : darkTextcolor,
+                        ),
+                      ),
+                      iconTheme: IconThemeData(
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? lightTextColor
+                            : darkTextcolor,
+                      ),
                       actions: [
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: IconButton(
                               onPressed: () {},
-                              icon:
-                                  const Icon(Icons.notifications_on_outlined)),
+                              icon: Icon(
+                                Icons.notifications_on_outlined,
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              )),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(5.0),
@@ -61,13 +92,19 @@ class SocialLayout extends StatelessWidget {
                                         type: PageTransitionType.size,
                                         alignment: Alignment.topRight));
                               },
-                              icon: const Icon(Icons.search_outlined)),
+                              icon: Icon(
+                                Icons.search_outlined,
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              )),
                         ),
                         const SizedBox(
                           width: 5,
                         ),
                       ]),
-                  drawer: const NavigationDrawer(),
+                  drawer: NavigationDrawer(),
                   body: cubit.Screens[cubit.currentIndex],
                   floatingActionButton: FloatingActionButton(
                     child: const Icon(
@@ -80,6 +117,10 @@ class SocialLayout extends StatelessWidget {
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerDocked,
                   bottomNavigationBar: AnimatedBottomNavigationBar(
+                    backgroundColor:
+                        CacheHelper.getValue(key: 'lightMode') == false
+                            ? darkBackground
+                            : Colors.white,
                     icons: const [
                       Icons.home_outlined,
                       Icons.chat_outlined,
@@ -87,8 +128,12 @@ class SocialLayout extends StatelessWidget {
                       Icons.person_outline
                     ],
                     activeColor: Colors.blue,
-                    splashColor: Colors.black,
+                    splashColor: Colors.white,
                     activeIndex: cubit.currentIndex,
+                    inactiveColor:
+                        CacheHelper.getValue(key: 'lightMode') == false
+                            ? Colors.white
+                            : Colors.black,
                     gapLocation: GapLocation.center,
                     notchSmoothness: NotchSmoothness.softEdge,
                     onTap: (index) {
@@ -109,11 +154,14 @@ class SocialLayout extends StatelessWidget {
 }
 
 class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
+  NavigationDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Drawer(
         width: 300,
+        backgroundColor: CacheHelper.getValue(key: 'lightMode') == false
+            ? darkBackground
+            : Colors.white,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -160,87 +208,134 @@ class NavigationDrawer extends StatelessWidget {
           ],
         ),
       );
-  Widget buildMenuItems(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            ListTile(
-              title: const Text(
-                'Dark Mode',
-                style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500),
+  Widget buildMenuItems(BuildContext context) => Container(
+        color: CacheHelper.getValue(key: 'lightMode') == false
+            ? darkBackground
+            : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              if (CacheHelper.getValue(key: 'lightMode'))
+                ListTile(
+                  title: Text(
+                    'Dark Mode',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? lightTextColor
+                            : darkTextcolor,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  leading: Icon(
+                    Icons.dark_mode_outlined,
+                    size: 26,
+                    color: CacheHelper.getValue(key: 'lightMode') == false
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  onTap: () {
+                    SocialCubit.get(context).changeLightMode();
+                  },
+                ),
+              if (!CacheHelper.getValue(key: 'lightMode'))
+                ListTile(
+                  title: Text(
+                    'Light Mode',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? lightTextColor
+                            : darkTextcolor,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  leading: Icon(
+                    Icons.light_mode_outlined,
+                    size: 26,
+                    color: CacheHelper.getValue(key: 'lightMode') == false
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  onTap: () {
+                    SocialCubit.get(context).changeLightMode();
+                  },
+                ),
+              ListTile(
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontWeight: FontWeight.w500),
+                ),
+                leading: Icon(
+                  Icons.person_outline,
+                  size: 26,
+                  color: CacheHelper.getValue(key: 'lightMode') == false
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  SocialCubit.get(context).changeBottomNav(3, context);
+                },
               ),
-              leading: const Icon(
-                Icons.dark_mode_outlined,
-                size: 26,
+              ListTile(
+                title: Text(
+                  'Search',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontWeight: FontWeight.w500),
+                ),
+                leading: Icon(
+                  Icons.search,
+                  size: 26,
+                  color: CacheHelper.getValue(key: 'lightMode') == false
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchScreen(),
+                      ));
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                SocialCubit.get(context).changeBottomNav(3, context);
-              },
-            ),
-            ListTile(
-              title: const Text(
-                'Profile',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500),
+              ListTile(
+                title: Text(
+                  'Settings',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontWeight: FontWeight.w500),
+                ),
+                leading: Icon(
+                  Icons.settings_outlined,
+                  size: 26,
+                  color: CacheHelper.getValue(key: 'lightMode') == false
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditProfileScreen(),
+                      ));
+                },
               ),
-              leading: const Icon(
-                Icons.person_outline,
-                size: 26,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                SocialCubit.get(context).changeBottomNav(3, context);
-              },
-            ),
-            ListTile(
-              title: const Text(
-                'Search',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500),
-              ),
-              leading: const Icon(
-                Icons.search,
-                size: 26,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchScreen(),
-                    ));
-              },
-            ),
-            ListTile(
-              title: const Text(
-                'Settings',
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500),
-              ),
-              leading: const Icon(
-                Icons.settings_outlined,
-                size: 26,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileScreen(),
-                    ));
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       );
 }

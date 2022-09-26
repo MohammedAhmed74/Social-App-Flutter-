@@ -30,7 +30,7 @@ class ChatsScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             height: 0.5,
-                            color: Colors.grey[300],
+                            color: Colors.grey[600],
                           ),
                         )),
                     itemCount: cubit.users.length);

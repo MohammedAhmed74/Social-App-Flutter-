@@ -12,6 +12,7 @@ import 'package:social_app/modules/Chats/openImageScreen.dart';
 import 'package:social_app/modules/Likes/postLikesScreen.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
 import 'package:social_app/shared/cubit/socialStates.dart';
+import 'package:social_app/shared/network/cacheHelper.dart';
 import 'package:social_app/shared/styles/colors.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 
@@ -47,6 +48,9 @@ class CommentsScreen extends StatelessWidget {
       var cubit = SocialCubit.get(context);
       return SafeArea(
           child: Scaffold(
+        backgroundColor: CacheHelper.getValue(key: 'lightMode') == true
+            ? Colors.white
+            : darkBackground,
         appBar: AppBar(
           titleSpacing: 0,
           title: const Text(
@@ -57,9 +61,11 @@ class CommentsScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Colors.black,
+              color: CacheHelper.getValue(key: 'lightMode') == false
+                  ? darkTextcolor
+                  : lightTextColor,
             ),
           ),
         ),
@@ -70,7 +76,6 @@ class CommentsScreen extends StatelessWidget {
               ConditionalBuilder(
                   condition: SocialCubit.get(context).comments.isNotEmpty,
                   fallback: (context) {
-                    print('fallbackkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
                     // if (!SocialCubit.get(context).searchForComments ||
                     //     cubit.posts[postIndex].comments_num == 0 &&
                     //     state is! SuccessDeleteCommentState && state is! SuccessCommentPostState)
@@ -78,7 +83,6 @@ class CommentsScreen extends StatelessWidget {
                             .posts[postIndex]
                             .comments_num ==
                         0) {
-                      print('dont search');
                       return Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,10 +96,15 @@ class CommentsScreen extends StatelessWidget {
                             ),
                             Text(
                               'No comments in this post.',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .caption!
-                                  .copyWith(fontSize: 14),
+                              style:
+                                  Theme.of(context).textTheme.caption!.copyWith(
+                                        fontSize: 14,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                false
+                                            ? darkTextcolor
+                                            : lightTextColor,
+                                      ),
                             ),
                             const SizedBox(
                               height: 60,
@@ -104,8 +113,6 @@ class CommentsScreen extends StatelessWidget {
                         ),
                       );
                     } else {
-                      print('search');
-
                       Timer(const Duration(seconds: 10), () {
                         SocialCubit.get(context).searchComments(false);
                       });
@@ -208,12 +215,8 @@ class CommentsScreen extends StatelessWidget {
                       ),
                       child: CircleAvatar(
                           radius: 22,
-                          backgroundImage: NetworkImage(SocialCubit.get(context)
-                                      .user!
-                                      .userImage !=
-                                  null
-                              ? SocialCubit.get(context).user!.userImage
-                              : 'https://c.files.bbci.co.uk/10E5A/production/_105901296_male.jpg')),
+                          backgroundImage: NetworkImage(
+                              SocialCubit.get(context).user!.userImage)),
                     ),
                     const SizedBox(
                       width: 5,
@@ -222,7 +225,13 @@ class CommentsScreen extends StatelessWidget {
                       child: TextFormField(
                         controller: commentCtrl,
                         style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                            fontSize: 14, fontWeight: FontWeight.w500),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color:
+                                  CacheHelper.getValue(key: 'lightMode') == true
+                                      ? lightTextColor
+                                      : darkTextcolor,
+                            ),
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: cubit.switchCommentHint(),
@@ -230,7 +239,13 @@ class CommentsScreen extends StatelessWidget {
                           hintStyle: Theme.of(context)
                               .textTheme
                               .caption!
-                              .copyWith(fontSize: 12),
+                              .copyWith(
+                                fontSize: 12,
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? lightTextColor
+                                    : darkTextcolor,
+                              ),
                         ),
                       ),
                     ),
@@ -468,7 +483,9 @@ class CommentsScreen extends StatelessWidget {
                   child: Container(
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? Colors.grey[200]
+                          : Colors.grey[600],
                       borderRadius: BorderRadius.circular(20),
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -496,7 +513,8 @@ class CommentsScreen extends StatelessWidget {
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyText1!
-                                        .copyWith(fontSize: 16),
+                                        .copyWith(
+                                            fontSize: 16, color: Colors.black),
                                   ),
                                   Spacer(),
                                   Text(
@@ -505,7 +523,10 @@ class CommentsScreen extends StatelessWidget {
                                     style: Theme.of(context)
                                         .textTheme
                                         .caption!
-                                        .copyWith(fontSize: 10),
+                                        .copyWith(
+                                          fontSize: 10,
+                                          color: Colors.black,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -525,8 +546,10 @@ class CommentsScreen extends StatelessWidget {
                                         .textTheme
                                         .bodyText1!
                                         .copyWith(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -595,7 +618,16 @@ class CommentsScreen extends StatelessWidget {
                                   ),
                                   Text(
                                     'write a reply..',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(
+                                          color: CacheHelper.getValue(
+                                                      key: 'lightMode') ==
+                                                  true
+                                              ? lightTextColor
+                                              : darkTextcolor,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -648,7 +680,16 @@ class CommentsScreen extends StatelessWidget {
                               ),
                               Text(
                                 'Like ${comment.likes_num}',
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      color: CacheHelper.getValue(
+                                                  key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                    ),
                               ),
                             ],
                           ),
@@ -679,7 +720,16 @@ class CommentsScreen extends StatelessWidget {
                               ),
                               Text(
                                 'Replys ${comment.replays_num}',
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
+                                      color: CacheHelper.getValue(
+                                                  key: 'lightMode') ==
+                                              true
+                                          ? lightTextColor
+                                          : darkTextcolor,
+                                    ),
                               ),
                             ],
                           ),
@@ -729,14 +779,18 @@ class CommentsScreen extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 25),
+            padding: const EdgeInsets.only(bottom: 25, left: 3),
             child: RotatedBox(
               quarterTurns: 90 + 45,
               child: Text(
                 '${numberToMonth[time.month]} ${time.day}',
                 textAlign: TextAlign.center,
-                style:
-                    Theme.of(context).textTheme.caption!.copyWith(fontSize: 10),
+                style: Theme.of(context).textTheme.caption!.copyWith(
+                      fontSize: 10,
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                    ),
               ),
             ),
           )
@@ -863,7 +917,7 @@ class CommentsScreen extends StatelessWidget {
                     child: Container(
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(133, 252, 223, 134),
+                        color: Color.fromARGB(235, 253, 233, 172),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -892,7 +946,9 @@ class CommentsScreen extends StatelessWidget {
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyText1!
-                                          .copyWith(fontSize: 14),
+                                          .copyWith(
+                                              fontSize: 14,
+                                              color: Colors.black),
                                     ),
                                     Spacer(),
                                     Text(
@@ -901,7 +957,8 @@ class CommentsScreen extends StatelessWidget {
                                       style: Theme.of(context)
                                           .textTheme
                                           .caption!
-                                          .copyWith(fontSize: 8),
+                                          .copyWith(
+                                              fontSize: 8, color: Colors.black),
                                     ),
                                   ],
                                 ),
@@ -922,7 +979,8 @@ class CommentsScreen extends StatelessWidget {
                                           .bodyText1!
                                           .copyWith(
                                               fontSize: 12,
-                                              fontWeight: FontWeight.w500),
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black),
                                     ),
                                   ),
                                 ),
@@ -1005,7 +1063,16 @@ class CommentsScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   'Like ${reply.likes_num}',
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? lightTextColor
+                                            : darkTextcolor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -1018,16 +1085,18 @@ class CommentsScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 25),
+              padding: const EdgeInsets.only(bottom: 25, left: 3),
               child: RotatedBox(
                 quarterTurns: 90 + 45,
                 child: Text(
                   '${numberToMonth[time.month]} ${time.day}',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context)
-                      .textTheme
-                      .caption!
-                      .copyWith(fontSize: 8),
+                  style: Theme.of(context).textTheme.caption!.copyWith(
+                        fontSize: 8,
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? lightTextColor
+                            : darkTextcolor,
+                      ),
                 ),
               ),
             )
@@ -1317,10 +1386,11 @@ class CommentsScreen extends StatelessWidget {
                           ),
                           Text(
                             'Update',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText1!
-                                .copyWith(fontSize: 16, color: Colors.blue),
+                            style:
+                                Theme.of(context).textTheme.bodyText1!.copyWith(
+                                      fontSize: 16,
+                                      color: Colors.blue,
+                                    ),
                           ),
                         ],
                       )),

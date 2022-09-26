@@ -167,3 +167,5 @@ class LoadingGetUsersWhoLikePostState extends SocialStates {}
 class SuccessGetUsersWhoLikePostState extends SocialStates {}
 
 class ErrorGetUsersWhoLikePostState extends SocialStates {}
+
+class ChangeLightModeState extends SocialStates {}
