@@ -14,6 +14,7 @@ import 'package:social_app/Layout/SocialLayout/socialLayout.dart';
 import 'package:social_app/models/App/commentModel.dart';
 import 'package:social_app/models/App/messageModel.dart';
 import 'package:social_app/models/App/postModel.dart';
+import 'package:social_app/models/Users/receiverModel.dart';
 import 'package:social_app/models/Users/userModel.dart';
 import 'package:social_app/modules/Chats/chatsScreen.dart';
 import 'package:social_app/modules/Comments/commentsScreen.dart';
@@ -71,13 +72,17 @@ class SocialCubit extends Cubit<SocialStates> {
   List<String> titles = ['Home', 'Chats', 'Users', 'Profile'];
 
   void changeBottomNav(int index, BuildContext context) {
+    if (index == 1) {
+      getUsersUnSeenMsgs().then((value) {
+        emit(SuccessGetingUnSeenMsgsState());
+      });
+    }
     if (index == 0) searchForPosts(true);
     if (index == 3) {
       getMyPosts(user!.uId);
       doSignOut(false);
       searchForPostsForMe(true);
     }
-    ;
     currentIndex = index;
     emit(ChangeNavState());
   }
@@ -220,8 +225,6 @@ class SocialCubit extends Cubit<SocialStates> {
       p0.ref.getDownloadURL().then((value) {
         messageImg = value;
         emit(SuccessUploadMessageImageState());
-        print(messageImg);
-        print('done');
       }).catchError((error) {
         print(error);
         emit(ErrorUploadMessageImageState());
@@ -237,7 +240,7 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(SuccessClearMessageImage());
   }
 
-  Future<void> EditProfileData({
+  Future<void> editProfileData({
     required String name,
     required String bio,
     required String phone,
@@ -648,12 +651,95 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
+  Future updateMessageSeen(
+      {required UserModel receiver, required bool isOnline}) async {
+    emit(LoadingSendMessageState());
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uId)
+        .collection('Chats')
+        .doc(receiver.uId)
+        .set({
+      'isOnline': isOnline,
+      'lastSeen': Timestamp.now(),
+      'unSeenMessages': 0,
+    });
+  }
+
+  ReceiverModel? receiverModel;
+  Future getUserChatInfo({
+    required String receiverUid,
+  }) async {
+    emit(LoadingGettingMessagesState());
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(receiverUid)
+        .collection('Chats')
+        .doc(user!.uId)
+        .get()
+        .then((value) {
+      receiverModel = ReceiverModel.fromJson(value.data());
+    });
+  }
+
+  List<int> receiversUnSeenMsgs = [];
+  Future getUsersUnSeenMsgs() async {
+    receiversUnSeenMsgs = [];
+    for (int i = 0; i < users.length; i++) {
+      DocumentSnapshot<Map<String, dynamic>>? value = await FirebaseFirestore
+          .instance
+          .collection('Users')
+          .doc(user!.uId)
+          .collection('Chats')
+          .doc(users[i].uId)
+          .get();
+      receiversUnSeenMsgs.add(value.data()?['unSeenMessages'] ?? 0);
+      value = null;
+    }
+  }
+
+  Future increaseUnSeenMessage({
+    required String receiverUid,
+  }) async {
+    int unSeenMessages = 0;
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(receiverUid)
+        .collection('Chats')
+        .doc(user!.uId)
+        .get()
+        .then((value) {
+      unSeenMessages = value.data()!['unSeenMessages'];
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(receiverUid)
+          .collection('Chats')
+          .doc(user!.uId)
+          .update({'unSeenMessages': unSeenMessages + 1});
+    });
+  }
+
+  Future emptyUnSeenMessage({
+    required String receiverUid,
+  }) async {
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user!.uId)
+        .collection('Chats')
+        .doc(receiverUid)
+        .update({'unSeenMessages': 0})
+        .then((value) {})
+        .catchError((error) {
+          print(error);
+        });
+  }
+
   List<MessageModel> messages = [];
   Future getMessages(
     String receiverUid, {
     bool newMessage = false,
     String? resiverId,
-    String? dateTime,
+    Timestamp? dateTime,
     String? message,
   }) async {
     emit(LoadingGettingMessagesState());

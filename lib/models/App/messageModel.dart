@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class MessageModel {
   late String resiverId;
   late String senderId;
-  late String dateTime;
+  late Timestamp dateTime; 
   late String message;
   late String image;
   File? fileImage;

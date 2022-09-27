@@ -94,7 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               print(bioCtrl.text);
-                              cubit.EditProfileData(
+                              cubit.editProfileData(
                                   bio: bioCtrl.text,
                                   name: nameCtrl.text,
                                   phone: phoneCtrl.text);
