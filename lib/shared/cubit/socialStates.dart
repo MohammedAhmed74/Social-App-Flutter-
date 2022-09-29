@@ -175,3 +175,5 @@ class LoadingGetingUnSeenMsgsState extends SocialStates {}
 class SuccessGetingUnSeenMsgsState extends SocialStates {}
 
 class ErrorGetingUnSeenMsgsState extends SocialStates {}
+
+class ClearNewMessagesNumberState extends SocialStates {}

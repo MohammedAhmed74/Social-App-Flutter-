@@ -566,7 +566,8 @@ class UsersProfile extends StatelessWidget {
                   ],
                   onSelected: (String s) {
                     if (s == delete) {
-                      SocialCubit.get(context).deletePost(post.postId);
+                      SocialCubit.get(context)
+                          .deletePost(post.postId, post.uId);
                     } else if (s == edit) {
                       SocialCubit.get(context).postImage = null;
                       editPostButton(
@@ -576,13 +577,13 @@ class UsersProfile extends StatelessWidget {
                           beforepick: true);
                     } else {
                       if (post.saved == true) {
-                        post.saved == false;
                         SocialCubit.get(context).savePost(post.postId, false);
-                        SocialCubit.get(context).realTimeSavePost(index, false);
+                        SocialCubit.get(context).realTimeSavePost(
+                            postIndex: index, save: false, myPosts: true);
                       } else {
-                        post.saved == true;
                         SocialCubit.get(context).savePost(post.postId, true);
-                        SocialCubit.get(context).realTimeSavePost(index, true);
+                        SocialCubit.get(context).realTimeSavePost(
+                            postIndex: index, save: true, myPosts: true);
                       }
                     }
                   },
@@ -1206,19 +1207,22 @@ class UsersProfile extends StatelessWidget {
                       onPressed: () {
                         if (SocialCubit.get(context).postImage == null) {
                           if (SocialCubit.get(context).commentImageCleared) {
-                            SocialCubit.get(context).editPost(post.postId, {
+                            SocialCubit.get(context).editPost(
+                                post.postId, post.uId, {
                               'text': postEditingCtrl.text,
                               'postImage': ''
                             });
                           } else {
-                            SocialCubit.get(context).editPost(
-                                post.postId, {'text': postEditingCtrl.text});
+                            SocialCubit.get(context).editPost(post.postId,
+                                post.uId, {'text': postEditingCtrl.text});
                           }
                           // return commentImageCleared to normal value
                           SocialCubit.get(context).clearImage(clear: false);
                         } else {
                           SocialCubit.get(context).editPostWithImage(
-                              postId: post.postId, text: postEditingCtrl.text);
+                              uId: post.uId,
+                              postId: post.postId,
+                              text: postEditingCtrl.text);
                         }
                         SocialCubit.get(context).postImage = null;
                         Navigator.pop(context);

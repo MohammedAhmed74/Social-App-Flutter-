@@ -128,7 +128,9 @@ class _SocialLayoutState extends State<SocialLayout> {
                       Icons.person_outline
                     ],
                     activeColor: Colors.blue,
-                    splashColor: Colors.white,
+                    splashColor: CacheHelper.getValue(key: 'lightMode') == false
+                        ? Colors.white
+                        : Colors.black,
                     activeIndex: cubit.currentIndex,
                     inactiveColor:
                         CacheHelper.getValue(key: 'lightMode') == false

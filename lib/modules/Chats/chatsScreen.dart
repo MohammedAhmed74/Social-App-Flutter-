@@ -27,13 +27,20 @@ class ChatsScreen extends StatelessWidget {
                   const Center(child: CircularProgressIndicator()),
               builder: (context) {
                 return ListView.separated(
-                    itemBuilder: ((context, index) => buildUserItem(context,
-                        cubit.users[index], cubit.receiversUnSeenMsgs[index])),
+                    itemBuilder: ((context, index) {
+                      for (int i = 0; i <= cubit.users.length; i++) {
+                        if (cubit.receiversUnSeenMsgs.length < i) {
+                          cubit.receiversUnSeenMsgs.add(0);
+                        }
+                      }
+                      return buildUserItem(context, cubit.users[index],
+                          cubit.receiversUnSeenMsgs[index]);
+                    }),
                     separatorBuilder: ((context, index) => Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Container(
                             height: 0.5,
-                            color: Colors.grey[600],
+                            color: Colors.grey[300],
                           ),
                         )),
                     itemCount: cubit.users.length);
@@ -49,15 +56,19 @@ class ChatsScreen extends StatelessWidget {
         SocialCubit.get(context).seaarchForMessages(true);
         SocialCubit.get(context).messages = [];
         SocialCubit.get(context).emptyUnSeenMessage(receiverUid: user.uId);
+
         SocialCubit.get(context)
             .updateMessageSeen(receiver: user, isOnline: true)
             .then((value) async {
           await SocialCubit.get(context).getUserChatInfo(receiverUid: user.uId);
-          Timer(Duration(seconds: 1), () {
+          Timer(const Duration(seconds: 1), () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ChatingScreen(receiver: user)));
+                    builder: (context) => ChatingScreen(
+                          receiver: user,
+                          unSeenMessagesNumber: unSeenMsgsNum,
+                        )));
           });
         });
       },
@@ -80,15 +91,16 @@ class ChatsScreen extends StatelessWidget {
                         : Colors.black,
                   ),
             ),
-            Spacer(),
-            CircleAvatar(
-              radius: 12,
-              backgroundColor: Colors.blue,
-              child: Text(
-                unSeenMsgsNum.toString(),
-                style: TextStyle(color: Colors.white),
-              ),
-            )
+            if (unSeenMsgsNum > 0) const Spacer(),
+            if (unSeenMsgsNum > 0)
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: Colors.blue,
+                child: Text(
+                  unSeenMsgsNum.toString(),
+                  style: const TextStyle(color: Colors.white),
+                ),
+              )
           ],
         ),
       ),

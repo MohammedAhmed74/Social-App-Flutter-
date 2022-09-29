@@ -24,9 +24,7 @@ class _PostScreenState extends State<PostScreen> {
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
         if (state is SuccessGetPostsState) {
-          print('before pop :::::::::::::::::');
           Navigator.pop(context);
-          print('after pop :::::::::::::::::');
         }
       },
       builder: (context, state) {
@@ -128,11 +126,11 @@ class _PostScreenState extends State<PostScreen> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 25, vertical: 20),
+                            padding: const EdgeInsets.only(
+                                right: 20, left: 20, top: 20, bottom: 15),
                             child: Container(
                               width: double.infinity,
-                              height: 160,
+                              height: 140,
                               child: TextFormField(
                                 controller: postCtrl,
                                 expands: true,
@@ -156,9 +154,6 @@ class _PostScreenState extends State<PostScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 2,
-                          ),
                           if (cubit.postImage != null)
                             Stack(
                               alignment: AlignmentDirectional.topEnd,
@@ -171,14 +166,18 @@ class _PostScreenState extends State<PostScreen> {
                                     image: FileImage(cubit.postImage!),
                                   ),
                                 ),
-                                IconButton(
-                                    onPressed: () {
-                                      cubit.removeImagePost();
-                                    },
-                                    icon: const Icon(
-                                      Icons.close,
-                                      color: Colors.white,
-                                    ))
+                                CircleAvatar(
+                                  backgroundColor:
+                                      Colors.black.withOpacity(0.3),
+                                  child: IconButton(
+                                      onPressed: () {
+                                        cubit.removeImagePost();
+                                      },
+                                      icon: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                      )),
+                                )
                               ],
                             ),
                         ],

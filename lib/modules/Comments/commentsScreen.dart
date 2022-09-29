@@ -1044,15 +1044,17 @@ class CommentsScreen extends StatelessWidget {
                             height: 30,
                             child: Row(
                               children: [
-                                if (reply.usersWhoLikeComment!.contains(
-                                    SocialCubit.get(context).user!.uId))
+                                if (reply.usersWhoLikeComment != null &&
+                                    reply.usersWhoLikeComment!.contains(
+                                        SocialCubit.get(context).user!.uId))
                                   const Icon(
                                     Icons.favorite,
                                     color: Colors.red,
                                     size: 20,
                                   ),
-                                if (!reply.usersWhoLikeComment!.contains(
-                                    SocialCubit.get(context).user!.uId))
+                                if (reply.usersWhoLikeComment == null ||
+                                    !reply.usersWhoLikeComment!.contains(
+                                        SocialCubit.get(context).user!.uId))
                                   const Icon(
                                     Icons.favorite_border,
                                     color: Colors.red,

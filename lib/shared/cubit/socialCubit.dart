@@ -727,11 +727,11 @@ class SocialCubit extends Cubit<SocialStates> {
         .doc(user!.uId)
         .collection('Chats')
         .doc(receiverUid)
-        .update({'unSeenMessages': 0})
-        .then((value) {})
-        .catchError((error) {
-          print(error);
-        });
+        .update({'unSeenMessages': 0}).then((value) {
+      getUsersUnSeenMsgs();
+    }).catchError((error) {
+      print(error);
+    });
   }
 
   List<MessageModel> messages = [];
@@ -1268,7 +1268,6 @@ class SocialCubit extends Cubit<SocialStates> {
           CommentModel.fromJson(json: value.data()!, id: value.id);
 
       if (!replys[index].usersWhoLikeComment!.contains(user!.uId)) {
-        print('likeeeeeeeeeeeeeeeeee');
         replys[index].usersWhoLikeComment!.add(user!.uId);
         replys[index].likes_num = replys[index].likes_num + 1;
         FirebaseFirestore.instance
@@ -1294,7 +1293,6 @@ class SocialCubit extends Cubit<SocialStates> {
           emit(ErrorLikeCommentState());
         });
       } else {
-        print('unLikeeeeeeeeeeeeeeeeeeeeee');
         replys[index].likes_num = replys[index].likes_num - 1;
         replys[index].usersWhoLikeComment!.remove(user!.uId);
         FirebaseFirestore.instance
@@ -1501,14 +1499,18 @@ class SocialCubit extends Cubit<SocialStates> {
 
   Future deletePost(
     String postId,
+    String uId,
   ) async {
     FirebaseFirestore.instance
         .collection('Posts')
         .doc(postId)
         .delete()
-        .then((value) {
+        .then((value) async {
       noPosts = true;
-      getPosts();
+      await getPosts();
+      getMyPosts(user!.uId);
+      doSignOut(false);
+      searchForPostsForMe(true);
       emit(SuccessDeletePostState());
     }).catchError((error) {
       print(error);
@@ -1518,15 +1520,17 @@ class SocialCubit extends Cubit<SocialStates> {
 
   Future editPost(
     String postId,
+    String uId,
     Map<String, dynamic> newData,
   ) async {
     FirebaseFirestore.instance
         .collection('Posts')
         .doc(postId)
         .update(newData)
-        .then((value) {
+        .then((value) async {
       noPosts = true;
-      getPosts();
+      await getPosts();
+      //getMyPosts(uId);
       emit(SuccessUpdatePostState());
     }).catchError((error) {
       print(error);
@@ -1536,7 +1540,7 @@ class SocialCubit extends Cubit<SocialStates> {
 
   late String? PostEditedImg2;
   Future<void> editPostWithImage(
-      {required String postId, required String text}) async {
+      {required String postId, required String text, required uId}) async {
     emit(LoadingUploadPostEditedImageState());
     PostEditedImg2 = '';
 
@@ -1546,7 +1550,7 @@ class SocialCubit extends Cubit<SocialStates> {
         .putFile(postImage!)
         .then((p0) {
       p0.ref.getDownloadURL().then((value) {
-        editPost(postId, {'postImage': value, 'text': text});
+        editPost(postId, uId, {'postImage': value, 'text': text});
         emit(SuccessUploadPostEditedImageState());
         print('done');
       }).catchError((error) {
@@ -1582,8 +1586,13 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  realTimeSavePost(int postIndex, bool save) {
-    posts[postIndex].saved = save;
+  realTimeSavePost({required int postIndex, required bool save, required bool myPosts}) {
+    if(myPosts) {
+      this.myPosts![postIndex].saved = save;
+    } else {
+      posts[postIndex].saved = save;
+    }
+    
     emit(SuccessUpdatePostState());
   }
 

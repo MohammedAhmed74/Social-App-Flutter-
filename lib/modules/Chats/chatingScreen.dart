@@ -19,8 +19,10 @@ import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'dart:async';
 
 class ChatingScreen extends StatelessWidget {
-  ChatingScreen({Key? key, required this.receiver});
+  ChatingScreen(
+      {Key? key, required this.receiver, required this.unSeenMessagesNumber});
   var messageCtrl = TextEditingController();
+  int unSeenMessagesNumber;
   UserModel receiver;
 
   @override
@@ -277,6 +279,7 @@ class ChatingScreen extends StatelessWidget {
                           child: IconButton(
                             onPressed: () async {
                               MessageModel msg;
+                              unSeenMessagesNumber = 0;
                               if (cubit.messageImage == null) {
                                 msg = MessageModel(
                                     resiverId: receiver.uId,
@@ -338,109 +341,151 @@ class ChatingScreen extends StatelessWidget {
 
   Widget buildOtherMessage(
       BuildContext context, MessageModel message, DateTime time, int index) {
-    return Align(
-      alignment: AlignmentDirectional.topStart,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(
-                      right: 10, left: 10, top: 10, bottom: 10),
-                  decoration: const BoxDecoration(
-                      color: Color.fromARGB(107, 158, 158, 158),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                          bottomRight: Radius.circular(12))),
+    return Column(
+      children: [
+        if (unSeenMessagesNumber > 0 && index == unSeenMessagesNumber - 1)
+          Builder(builder: (context) {
+            Timer(Duration(seconds: 5), () {
+              unSeenMessagesNumber = 0;
+              SocialCubit.get(context).emit(ClearNewMessagesNumberState());
+            });
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Container(
+                width: double.infinity,
+                height: 30,
+                color: Colors.black.withOpacity(0.1),
+                child: Center(
+                  child: Text(
+                    'New messages',
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(1), fontSize: 14),
+                  ),
+                ),
+              ),
+            );
+          }),
+        Align(
+          alignment: AlignmentDirectional.topStart,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 100,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (message.message != '')
+                      Container(
+                        padding: const EdgeInsets.only(
+                            right: 10, left: 10, top: 10, bottom: 10),
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(107, 158, 158, 158),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                topRight: Radius.circular(12),
+                                bottomRight: Radius.circular(12))),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (message.message != '')
+                              Text(
+                                message.message,
+                                textAlign: TextAlign.center,
+                                maxLines: 15,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500),
+                              ),
+                            if (message.image != '' && message.message != '')
+                              const SizedBox(
+                                height: 5,
+                              ),
+                            if (message.image != '')
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(SwipeablePageRoute(
+                                    builder: (BuildContext context) =>
+                                        OpenImageScreen(
+                                      imageUrl: message.image,
+                                    ),
+                                  ));
+                                },
+                                child: Image(
+                                  image: NetworkImage(
+                                    message.image,
+                                  ),
+                                  width: 200,
+                                  fit: BoxFit.fitWidth,
+                                ),
+                              ),
+                            // Text(
+                            //   '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
+                            //   textAlign: TextAlign.start,
+                            //   style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                            //       color: Colors.grey.withOpacity(0),
+                            //       // color: CacheHelper.getValue(key: 'lightMode') == true? lightTextColor : darkTextcolor,
+                            //       fontSize: 10,
+                            //       height: 0,
+                            //       fontWeight: FontWeight.w300),
+                            // ),
+                          ],
+                        ),
+                      ),
+                      if (index ==
+                                  SocialCubit.get(context).messages.length -
+                                      1 &&
+                              SocialCubit.get(context)
+                                      .messages[index - 1]
+                                      .senderId !=
+                                  message.senderId ||
+                          index <
+                                  SocialCubit.get(context).messages.length -
+                                      1 &&
+                              index > 0 &&
+                              SocialCubit.get(context)
+                                      .messages[index - 1]
+                                      .senderId !=
+                                  message.senderId ||
+                          index == 0)
                         Text(
-                          message.message,
-                          textAlign: TextAlign.center,
+                          '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
+                          textAlign: TextAlign.start,
                           style: Theme.of(context)
                               .textTheme
                               .bodyText1!
                               .copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
+                                  fontSize: 10, fontWeight: FontWeight.w300),
                         ),
-                      if (message.image != '' && message.message != '')
-                        const SizedBox(
-                          height: 5,
-                        ),
-                      if (message.image != '')
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(SwipeablePageRoute(
-                              builder: (BuildContext context) =>
-                                  OpenImageScreen(
-                                imageUrl: message.image,
-                              ),
-                            ));
-                          },
-                          child: Image(
-                            image: NetworkImage(
-                              message.image,
-                            ),
-                            width: 200,
-                            fit: BoxFit.fitWidth,
-                          ),
-                        ),
-                      // Text(
-                      //   '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
-                      //   textAlign: TextAlign.start,
-                      //   style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                      //       color: Colors.grey.withOpacity(0),
-                      //       // color: CacheHelper.getValue(key: 'lightMode') == true? lightTextColor : darkTextcolor,
-                      //       fontSize: 10,
-                      //       height: 0,
-                      //       fontWeight: FontWeight.w300),
-                      // ),
                     ],
                   ),
                 ),
-                if (index == SocialCubit.get(context).messages.length - 1 &&
-                        SocialCubit.get(context).messages[index - 1].senderId !=
-                            message.senderId ||
-                    index < SocialCubit.get(context).messages.length - 1 &&
-                        index > 0 &&
-                        SocialCubit.get(context).messages[index - 1].senderId !=
-                            message.senderId ||
-                    index == 0)
-                  Text(
-                    '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
-                    textAlign: TextAlign.start,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(fontSize: 10, fontWeight: FontWeight.w300),
-                  ),
-              ],
-            ),
+              ),
+              const Spacer(),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Text(
+                  '${time.hour}:${time.minute}',
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? lightTextColor
+                          : darkTextcolor,
+                      fontSize: 10,
+                      height: 0,
+                      fontWeight: FontWeight.w300),
+                ),
+              ),
+            ],
           ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Text(
-              '${time.hour}:${time.minute}',
-              textAlign: TextAlign.start,
-              style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                  color: CacheHelper.getValue(key: 'lightMode') == true
-                      ? lightTextColor
-                      : darkTextcolor,
-                  fontSize: 10,
-                  height: 0,
-                  fontWeight: FontWeight.w300),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -493,83 +538,91 @@ class ChatingScreen extends StatelessWidget {
           const Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(
-                      right: 10, left: 10, top: 10, bottom: 10),
-                  decoration: const BoxDecoration(
-                      color: Color.fromARGB(144, 255, 236, 179),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                          bottomLeft: Radius.circular(12))),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (message.message != '')
-                        Text(
-                          message.message,
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                      if (message.image != '' && message.message != '')
-                        const SizedBox(
-                          height: 5,
-                        ),
-                      if (message.image != '')
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).push(SwipeablePageRoute(
-                              builder: (BuildContext context) =>
-                                  OpenImageScreen(
-                                imageUrl: message.image,
-                              ),
-                            ));
-                          },
-                          child: Image(
-                            image: NetworkImage(
-                              message.image,
-                            ),
-                            width: 200,
-                            fit: BoxFit.fitWidth,
+            child: Container(
+              width: MediaQuery.of(context).size.width - 110,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(
+                        right: 10, left: 10, top: 10, bottom: 10),
+                    decoration: const BoxDecoration(
+                        color: Color.fromARGB(144, 255, 236, 179),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                            bottomLeft: Radius.circular(12))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (message.message != '')
+                          Text(
+                            message.message,
+                            textAlign: TextAlign.start,
+                            maxLines: 15,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(
+                                    fontSize: 14, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                      // Text(
-                      //   '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
-                      //   textAlign: TextAlign.start,
-                      //   style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                      //       color: Colors.amber.withOpacity(0),
-                      //       // color: CacheHelper.getValue(key: 'lightMode') == true? lightTextColor : darkTextcolor,
-                      //       fontSize: 10,
-                      //       height: 0,
-                      //       fontWeight: FontWeight.w300),
-                      // ),
-                    ],
+                        if (message.image != '' && message.message != '')
+                          const SizedBox(
+                            height: 5,
+                          ),
+                        if (message.image != '')
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(SwipeablePageRoute(
+                                builder: (BuildContext context) =>
+                                    OpenImageScreen(
+                                  imageUrl: message.image,
+                                ),
+                              ));
+                            },
+                            child: Image(
+                              image: NetworkImage(
+                                message.image,
+                              ),
+                              width: 200,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        // Text(
+                        //   '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
+                        //   textAlign: TextAlign.start,
+                        //   style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                        //       color: Colors.amber.withOpacity(0),
+                        //       // color: CacheHelper.getValue(key: 'lightMode') == true? lightTextColor : darkTextcolor,
+                        //       fontSize: 10,
+                        //       height: 0,
+                        //       fontWeight: FontWeight.w300),
+                        // ),
+                      ],
+                    ),
                   ),
-                ),
-                if (index == SocialCubit.get(context).messages.length - 1 &&
-                        SocialCubit.get(context).messages[index - 1].senderId !=
-                            message.senderId ||
-                    index < SocialCubit.get(context).messages.length - 1 &&
-                        index > 0 &&
-                        SocialCubit.get(context).messages[index - 1].senderId !=
-                            message.senderId ||
-                    index == 0)
-                  Text(
-                    '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
-                    textAlign: TextAlign.start,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1!
-                        .copyWith(fontSize: 10, fontWeight: FontWeight.w300),
-                  ),
-              ],
+                  if (index == SocialCubit.get(context).messages.length - 1 &&
+                          SocialCubit.get(context)
+                                  .messages[index - 1]
+                                  .senderId !=
+                              message.senderId ||
+                      index < SocialCubit.get(context).messages.length - 1 &&
+                          index > 0 &&
+                          SocialCubit.get(context)
+                                  .messages[index - 1]
+                                  .senderId !=
+                              message.senderId ||
+                      index == 0)
+                    Text(
+                      '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
+                      textAlign: TextAlign.start,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1!
+                          .copyWith(fontSize: 10, fontWeight: FontWeight.w300),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

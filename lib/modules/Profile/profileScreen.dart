@@ -367,7 +367,7 @@ class ProfileScreen extends StatelessWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemBuilder: ((context, index) {
-                          Timestamp t = cubit.posts[index].time;
+                          Timestamp t = cubit.myPosts![index].time;
                           DateTime time = t.toDate();
                           if (index == cubit.myPosts!.length - 1) {
                             cubit.refreshPostScreen();
@@ -545,12 +545,13 @@ class ProfileScreen extends StatelessWidget {
                           width: 10,
                         ),
                         if (post.saved == true)
-                           Icon(
+                          Icon(
                             Icons.flag,
                             size: 18,
-                            color: CacheHelper.getValue(key: 'lightMode') == true
-                        ? lightTextColor
-                        : darkTextcolor,
+                            color:
+                                CacheHelper.getValue(key: 'lightMode') == true
+                                    ? lightTextColor
+                                    : darkTextcolor,
                           ),
                       ],
                     )
@@ -600,7 +601,8 @@ class ProfileScreen extends StatelessWidget {
                   ],
                   onSelected: (String s) {
                     if (s == delete) {
-                      SocialCubit.get(context).deletePost(post.postId);
+                      SocialCubit.get(context)
+                          .deletePost(post.postId, post.uId);
                     } else if (s == edit) {
                       SocialCubit.get(context).postImage = null;
                       editPostButton(
@@ -611,12 +613,12 @@ class ProfileScreen extends StatelessWidget {
                     } else {
                       if (post.saved == true) {
                         SocialCubit.get(context).savePost(post.postId, false);
-                        SocialCubit.get(context).realTimeSavePost(index, false);
-                        post.saved == false;
+                        SocialCubit.get(context).realTimeSavePost(
+                            postIndex: index, save: false, myPosts: true);
                       } else {
                         SocialCubit.get(context).savePost(post.postId, true);
-                        SocialCubit.get(context).realTimeSavePost(index, true);
-                        post.saved == true;
+                        SocialCubit.get(context).realTimeSavePost(
+                            postIndex: index, save: true, myPosts: true);
                       }
                     }
                   },
@@ -844,7 +846,7 @@ class ProfileScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 if (SocialCubit.get(context)
-                                    .posts[index]
+                                    .myPosts![index]
                                     .iLikeIt)
                                   const Icon(
                                     Icons.favorite,
@@ -852,7 +854,7 @@ class ProfileScreen extends StatelessWidget {
                                     size: 20,
                                   ),
                                 if (!SocialCubit.get(context)
-                                    .posts[index]
+                                    .myPosts![index]
                                     .iLikeIt)
                                   const Icon(
                                     Icons.favorite_border,
@@ -1163,22 +1165,28 @@ class ProfileScreen extends StatelessWidget {
                       onPressed: () {
                         if (SocialCubit.get(context).postImage == null) {
                           if (SocialCubit.get(context).commentImageCleared) {
-                            SocialCubit.get(context).editPost(post.postId, {
+                            SocialCubit.get(context).editPost(
+                                post.postId, post.uId, {
                               'text': postEditingCtrl.text,
                               'postImage': ''
                             });
                           } else {
-                            SocialCubit.get(context).editPost(
-                                post.postId, {'text': postEditingCtrl.text});
+                            SocialCubit.get(context).editPost(post.postId,
+                                post.uId, {'text': postEditingCtrl.text});
                           }
                           // return commentImageCleared to normal value
                           SocialCubit.get(context).clearImage(clear: false);
                         } else {
                           SocialCubit.get(context).editPostWithImage(
-                              postId: post.postId, text: postEditingCtrl.text);
+                              uId: post.uId,
+                              postId: post.postId,
+                              text: postEditingCtrl.text);
                         }
                         SocialCubit.get(context).postImage = null;
                         Navigator.pop(context);
+                        SocialCubit.get(context).myPosts![index].text =
+                            postEditingCtrl.text;
+                        postEditingCtrl.text = '';
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

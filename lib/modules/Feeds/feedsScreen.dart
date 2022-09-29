@@ -390,7 +390,8 @@ class FeedsScreen extends StatelessWidget {
                   ],
                   onSelected: (String s) {
                     if (s == delete) {
-                      SocialCubit.get(context).deletePost(post.postId);
+                      SocialCubit.get(context)
+                          .deletePost(post.postId, post.uId);
                     } else if (s == edit) {
                       SocialCubit.get(context).postImage = null;
                       editPostButton(
@@ -401,11 +402,11 @@ class FeedsScreen extends StatelessWidget {
                     } else {
                       if (post.saved == true) {
                         SocialCubit.get(context).savePost(post.postId, false);
-                        SocialCubit.get(context).realTimeSavePost(index, false);
+                        SocialCubit.get(context).realTimeSavePost(postIndex: index, save: false, myPosts: false);
                         post.saved == false;
                       } else {
                         SocialCubit.get(context).savePost(post.postId, true);
-                        SocialCubit.get(context).realTimeSavePost(index, true);
+                        SocialCubit.get(context).realTimeSavePost(postIndex: index, save: true, myPosts: false);
                         post.saved == true;
                       }
                     }
@@ -875,6 +876,7 @@ class FeedsScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
+                          const Spacer(),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: CircleAvatar(
@@ -896,7 +898,7 @@ class FeedsScreen extends StatelessWidget {
                                   });
                                 },
                                 icon: Icon(Icons.edit),
-                                color: defaultColor,
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -974,19 +976,22 @@ class FeedsScreen extends StatelessWidget {
                       onPressed: () {
                         if (SocialCubit.get(context).postImage == null) {
                           if (SocialCubit.get(context).commentImageCleared) {
-                            SocialCubit.get(context).editPost(post.postId, {
+                            SocialCubit.get(context).editPost(
+                                post.postId, post.uId, {
                               'text': postEditingCtrl.text,
                               'postImage': ''
                             });
                           } else {
-                            SocialCubit.get(context).editPost(
-                                post.postId, {'text': postEditingCtrl.text});
+                            SocialCubit.get(context).editPost(post.postId,
+                                post.uId, {'text': postEditingCtrl.text});
                           }
                           // return commentImageCleared to normal value
                           SocialCubit.get(context).clearImage(clear: false);
                         } else {
                           SocialCubit.get(context).editPostWithImage(
-                              postId: post.postId, text: postEditingCtrl.text);
+                              uId: post.uId,
+                              postId: post.postId,
+                              text: postEditingCtrl.text);
                         }
                         SocialCubit.get(context).postImage = null;
                         Navigator.pop(context);
