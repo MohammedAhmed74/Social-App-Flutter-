@@ -343,6 +343,7 @@ class ChatingScreen extends StatelessWidget {
       BuildContext context, MessageModel message, DateTime time, int index) {
     return Column(
       children: [
+        // Only if there are new messages
         if (unSeenMessagesNumber > 0 && index == unSeenMessagesNumber - 1)
           Builder(builder: (context) {
             Timer(Duration(seconds: 5), () {
