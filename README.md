@@ -15,8 +15,6 @@ Some screenshots from the application :
 
 ![IMG_20221007_141545](https://user-images.githubusercontent.com/114262032/194739618-b5ba0a88-63d3-4070-bf38-53f59bacc723.jpg)
 
-![IMG_20221007_141545](https://user-images.githubusercontent.com/114262032/194739632-2c1c001b-0fe1-49d3-8045-93789d8f5732.jpg)
-
 ![IMG_20221007_141609](https://user-images.githubusercontent.com/114262032/194739635-45965335-a73a-4b6c-9ded-8ffd1e74f1c9.jpg)
 
 
