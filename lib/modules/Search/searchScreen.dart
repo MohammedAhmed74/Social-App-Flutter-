@@ -34,7 +34,13 @@ class _SearchScreenState extends State<SearchScreen> {
       builder: (context, state) {
         return SafeArea(
             child: Scaffold(
+          backgroundColor: CacheHelper.getValue(key: 'lightMode') == false
+              ? darkBackground
+              : Colors.white,
           appBar: AppBar(
+            backgroundColor: CacheHelper.getValue(key: 'lightMode') == false
+                ? darkBackground
+                : Colors.white,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_ios_new,

@@ -9,4 +9,6 @@ class ReceiverModel {
     isOnline = json?['isOnline'];
     lastSeen = seenTime!.toDate();
   }
+  ReceiverModel(
+      {required this.isOnline, required this.lastSeen, required this.seenTime});
 }

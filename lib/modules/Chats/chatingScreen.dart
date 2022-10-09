@@ -43,6 +43,9 @@ class ChatingScreen extends StatelessWidget {
                 ? darkBackground
                 : Colors.white,
             appBar: AppBar(
+              backgroundColor: CacheHelper.getValue(key: 'lightMode')
+                  ? Colors.white
+                  : darkBackground,
               titleSpacing: 0,
               elevation: 0.5,
               leading: IconButton(
@@ -73,7 +76,12 @@ class ChatingScreen extends StatelessWidget {
                   ),
                   Text(
                     receiver.name,
-                    style: const TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: CacheHelper.getValue(key: 'lightMode') == true
+                          ? Colors.black
+                          : Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -346,7 +354,7 @@ class ChatingScreen extends StatelessWidget {
         // Only if there are new messages
         if (unSeenMessagesNumber > 0 && index == unSeenMessagesNumber - 1)
           Builder(builder: (context) {
-            Timer(Duration(seconds: 5), () {
+            Timer(const Duration(seconds: 5), () {
               unSeenMessagesNumber = 0;
               SocialCubit.get(context).emit(ClearNewMessagesNumberState());
             });
@@ -355,12 +363,17 @@ class ChatingScreen extends StatelessWidget {
               child: Container(
                 width: double.infinity,
                 height: 30,
-                color: Colors.black.withOpacity(0.1),
+                color: CacheHelper.getValue(key: 'lightMode') == true
+                    ? Colors.black.withOpacity(0.1)
+                    : Colors.white.withOpacity(0.7),
                 child: Center(
                   child: Text(
                     'New messages',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(1), fontSize: 14),
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? Colors.white.withOpacity(1)
+                            : Colors.black.withOpacity(1),
+                        fontSize: 14),
                   ),
                 ),
               ),
@@ -401,7 +414,12 @@ class ChatingScreen extends StatelessWidget {
                                     .bodyText1!
                                     .copyWith(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w500),
+                                        fontWeight: FontWeight.w500,
+                                        color: CacheHelper.getValue(
+                                                    key: 'lightMode') ==
+                                                true
+                                            ? Colors.black
+                                            : Colors.white),
                               ),
                             if (message.image != '' && message.message != '')
                               const SizedBox(
@@ -438,7 +456,8 @@ class ChatingScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (index ==
+                      if (SocialCubit.get(context).messages.length > 1 &&
+                              index ==
                                   SocialCubit.get(context).messages.length -
                                       1 &&
                               SocialCubit.get(context)
@@ -461,7 +480,13 @@ class ChatingScreen extends StatelessWidget {
                               .textTheme
                               .bodyText1!
                               .copyWith(
-                                  fontSize: 10, fontWeight: FontWeight.w300),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w300,
+                                color: CacheHelper.getValue(key: 'lightMode') ==
+                                        true
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
                         ),
                     ],
                   ),
@@ -528,10 +553,12 @@ class ChatingScreen extends StatelessWidget {
                 if (SocialCubit.get(context).receiverModel!.isOnline! == true ||
                     time.isBefore(
                         SocialCubit.get(context).receiverModel!.lastSeen!))
-                  const Icon(
+                  Icon(
                     Icons.remove_red_eye,
                     size: 12,
-                    color: Colors.black,
+                    color: CacheHelper.getValue(key: 'lightMode') == true
+                        ? lightTextColor
+                        : darkTextcolor,
                   ),
               ],
             ),
@@ -547,9 +574,11 @@ class ChatingScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.only(
                         right: 10, left: 10, top: 10, bottom: 10),
-                    decoration: const BoxDecoration(
-                        color: Color.fromARGB(144, 255, 236, 179),
-                        borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                        color: CacheHelper.getValue(key: 'lightMode') == true
+                            ? const Color.fromARGB(144, 255, 236, 179)
+                            : const Color.fromARGB(200, 255, 227, 142),
+                        borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),
                             bottomLeft: Radius.circular(12))),
@@ -565,7 +594,13 @@ class ChatingScreen extends StatelessWidget {
                                 .textTheme
                                 .bodyText1!
                                 .copyWith(
-                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: CacheHelper.getValue(
+                                                key: 'lightMode') ==
+                                            true
+                                        ? Colors.black
+                                        : Colors.white),
                           ),
                         if (message.image != '' && message.message != '')
                           const SizedBox(
@@ -602,7 +637,9 @@ class ChatingScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (index == SocialCubit.get(context).messages.length - 1 &&
+                  if (SocialCubit.get(context).messages.length > 1 &&
+                          index ==
+                              SocialCubit.get(context).messages.length - 1 &&
                           SocialCubit.get(context)
                                   .messages[index - 1]
                                   .senderId !=
@@ -617,10 +654,14 @@ class ChatingScreen extends StatelessWidget {
                     Text(
                       '~${SocialCubit.get(context).getUserInfo(message.senderId, 'name')}',
                       textAlign: TextAlign.start,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1!
-                          .copyWith(fontSize: 10, fontWeight: FontWeight.w300),
+                      style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w300,
+                            color:
+                                CacheHelper.getValue(key: 'lightMode') == true
+                                    ? Colors.black
+                                    : Colors.white,
+                          ),
                     ),
                 ],
               ),

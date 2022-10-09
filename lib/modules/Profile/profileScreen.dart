@@ -11,6 +11,7 @@ import 'package:social_app/models/App/postModel.dart';
 import 'package:social_app/modules/Chats/openImageScreen.dart';
 import 'package:social_app/modules/Comments/commentsScreen.dart';
 import 'package:social_app/modules/EditProfileData/editProfileScreen.dart';
+import 'package:social_app/modules/Likes/postLikesScreen.dart';
 import 'package:social_app/modules/Post/postScreen.dart';
 import 'package:social_app/shared/components/constants.dart';
 import 'package:social_app/shared/cubit/socialCubit.dart';
@@ -685,7 +686,15 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   if (post.likes_num > 0)
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LikesScreen(
+                                userWhoLikeIds: post.userWhoLikeIds!,
+                              ),
+                            ));
+                      },
                       child: Row(
                         children: [
                           const Icon(

@@ -678,7 +678,14 @@ class SocialCubit extends Cubit<SocialStates> {
         .doc(user!.uId)
         .get()
         .then((value) {
-      receiverModel = ReceiverModel.fromJson(value.data());
+      if (value.exists) {
+        receiverModel = ReceiverModel.fromJson(value.data());
+      } else {
+        receiverModel = ReceiverModel(
+            isOnline: false,
+            lastSeen: DateTime.now().subtract(const Duration(days: 5)),
+            seenTime: Timestamp.now());
+      }
     });
   }
 
@@ -1586,13 +1593,14 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  realTimeSavePost({required int postIndex, required bool save, required bool myPosts}) {
-    if(myPosts) {
+  realTimeSavePost(
+      {required int postIndex, required bool save, required bool myPosts}) {
+    if (myPosts) {
       this.myPosts![postIndex].saved = save;
     } else {
       posts[postIndex].saved = save;
     }
-    
+
     emit(SuccessUpdatePostState());
   }
 
